@@ -1,0 +1,53 @@
+#!/bin/bash
+# Shane E Gordon
+# Fri Feb 14 13:45:58 EST 2014
+# v1.01
+
+# ChangeLog
+# v1.01 - The initial opt. part of simulations (opt.*) is no longer included when reading DCD files. This removes some non-equilibrium effects that may hinder clustering methods in MSMBuilder.
+
+# This script functions to align each protein atoms from each trajectory series with a common PDB template, "reference.pdb", which should be placed in the base folder. Trajectories are then written out with only protein atoms and one of any ligands in the system with the RESNAME of "LIG" to a new folder, "$ODIR", under the name of their original directory.
+
+# Declare some variables
+# Change STRING to something common to all directories of interest
+
+STRING="equil"
+ODIR="a2_ProteinOnly"
+VMDDIR="/usr/local/vmd/1.9.1/bin/vmd"
+
+# Safety check
+
+if [ -d $ODIR ]
+then
+	read -p "Directory $ODIR already exists. Overwrite (Yes/No)?" choice
+	case "$choice" in 
+		  yes|Yes ) echo "Okay...";;
+		  no|No ) echo "Right, no"; 
+		    exit;;
+		    * ) echo "invalid";;
+	      esac
+	
+	rm -r $ODIR
+	mkdir $ODIR
+else 
+	mkdir $ODIR
+	echo "Directory '$ODIR' not found; making new directory"
+fi
+
+# Important parts
+
+for DIR in $STRING; 
+do (
+	cd ./$DIR; 
+    sed "s/REPLACE/${DIR}/g" ../Analysis/scripts/temp.a1_extract_fitted_ligands_protein > TEMP
+    echo "*****Now processing ${DIR}*****"; 
+    $VMDDIR InputFiles/*.psf OutputFiles/[0-9]*.dcd -dispdev text -e TEMP; 
+    rm TEMP
+    ); 
+    done
+
+# Unset variables
+unset STRING
+unset ODIR
+unset VMDDIR
+
