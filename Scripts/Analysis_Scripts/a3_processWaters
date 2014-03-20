@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# Shane E Gordon
+# Fri Jan 31 18:03:26 EST 2014
+# v1.0
+
+#This part just makes some dependent scripts which are deleted at the conclusion of this script
+cd ./Analysis
+if [ -f ./getwaters.tcl ]
+	then
+	else
+		echo 
+		"set outfile [open resid_activewaters.dat w]; 
+		set numframes [molinfo top get numframes] 
+		set wat [atomselect top \"water and name OH2 and within 9 of segname P1 and resid 163 and name NZ\"]
+		for 
+			{
+			set frame 0
+		} 
+		{
+			\$frame < \$numframes
+		} 
+		{
+			incr frame 5
+		} 
+		{
+			\$wat frame \$frame
+			\$wat update
+			set nh2o [ \$wat num ]
+			puts \$outfile "\$frame \$nh2o" 
+		}
+		close \$outfile
+		set outfile [ open gnuplot_activewaters.gpi w ]
+		puts \$outfile "set term png
+		set output 'resid_activewaters.png'
+		set xlabel 'Frame'
+		set title 'Hydrating Waters'
+		set yrange \[0:30]
+		set ylabel '# Waters'
+		plot 'resid_activewaters.dat' with lines
+		replot
+		exit\
+		"
+		source activewaters.tcl
+		" > ./getwaters.tcl
+	fi
+
+if [ -f ./activewaters.tcl ]
+then
+else
+	echo
+	"set lig1 [atomselect top \"resname LIG and resid 1\"]
+	set liga [atomselect top \"resname LIG\"]
+	set nlig1 [ \$lig1 num ]
+	set nliga [ \$liga num ]
+	set q [ expr \$nliga / \$nlig1 ]
+	for 
+		{ set r 1 } { \$r <= \$q } { incr r 1 } {
+	set outfile [ open resid_hydratingwaters_\$r.dat w ];
+	set numframes [ molinfo top get numframes ]
+	set wat [atomselect top \"water and name OH2 and within 4.5 of resname LIG and resid \$r\"]
+	for 
+		{ set frame 0 } 
+		{ \$frame < \$numframes } 
+		{ incr frame 5 } 
+		{ \$wat frame \$frame }
+		\$wat update
+		set nh2o [ $wat num ]
+		puts \$outfile \"\$frame \$nh2o\"
+	}
+	close \$outfile
+	set outfile [ open gnuplot_\$r.gpi w ]
+	puts \$outfile \"set term png
+	set output 'resid_hydratingwaters_\$r.png'
+	set xlabel 'Frame'
+	set ylabel '\# Waters'
+	plot 'resid_hydratingwaters_\$r.dat' with lines
+	replot
+	exit\"
+}
+exit
+"
+fi
+cd ../
+
+# Meat and bones of the script
+for i in *ns_pyr; 
+do 
+	(
+	cd $i; 
+	echo "Now processing $i"; 
+	/usr/local/vmd/1.9.1/bin/vmd InputFiles/ionized.psf OutputFiles/2013*.dcd -dispdev text -e ../Analysis/getwaters.tcl
+	); 
+done
+rm ./Analysis/getwaters.tcl;
+rm ./Analysis/activewaters.tcl
+# Clears existing folders if found
+for i in ActiveWaters_folder Watersanalysis;
+do
+	(
+	if [ -d ${i} ]
+	then
+		rm -r ${i}
+		mkdir ${i}
+		echo "Directory '${i}' found and destroyed; making new directory"
+	else
+		mkdir ${i}
+		echo "Directory '${i}' not found; making new directory"
+	fi
+	); 
+done
+sleep 10
+# Moves PNG and DAT graph files to their appropriate directories and deletes all gnuplot configuration files
+for i in *ns_pyr; 
+do 
+	(
+	cd $i; 
+	mv resid_activewaters.png ../ActiveWaters_folder/$i.resid_activewaters.png; 
+	mv resid_activewaters.dat ../ActiveWaters_folder/$i.resid_activewaters.dat;
+	for j in resid_hydratingwaters_*; 
+	do 
+		( 
+		mv $j ../Watersanalysis_folder/$i.$j
+		); 
+	done
+	); 
+done

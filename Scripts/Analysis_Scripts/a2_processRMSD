@@ -1,0 +1,50 @@
+#!/bin/bash
+# Shane E Gordon
+# v1.0b
+# Mon Feb  3 12:34:31 EST 2014
+# NOTE: Script is not currently working. Need to think about how to configure ./Tools/rmsd.tcl such that .dat files include within their name the resid to which they pertain.
+
+# Checking if the directories needed exist before starting
+if [ -d extracted_protein ];
+then
+	echo "extracted_protein directory exists. Proceeding";
+else
+	echo "Need to create the extracted_protein directory first!";
+	exit
+fi
+sleep 2
+# The meat and bones
+cd extracted_protein
+for MDDir in *ns*; 
+do (
+	cd ${MDDir}; 
+	echo "****Now processing ${MDDir}*****"; 
+	/usr/local/vmd/1.9.1/bin/vmd ${MDDir}.psf ${MDDir}.fitted.protein.lig.dcd -dispdev text -e ../../Analysis/Tools/rmsd.tcl;
+	/usr/local/vmd/1.9.1/bin/vmd ${MDDir}.psf ${MDDir}.fitted.protein.lig.dcd -dispdev text -e ../../Analysis/Tools/rmsd.tcl
+	);
+done
+cd ../
+# Clears existing folders if found
+if [ -d RMSD_folder ]
+then
+	rm -r RMSD_folder
+	mkdir RMSD_folder
+	echo "Directory 'RMSD_folder' already exists! Cleared folder."
+else
+	mkdir RMSD_folder
+	echo "Directory 'RMSD_folder' has been created"
+fi
+sleep 2
+# Moves .dat graph files to their appropriate directories and deletes all gnuplot configuration files
+cd extracted_protein
+for MDDir in *ns_pyr; 
+do (
+	cd ${MDDir}; 
+	for RMSDFile in *.dat; 
+	do 
+		(
+		mv ${RMSDFile} ../../RMSD_folder/${MDDir}.${RMSDFile}
+		); 
+	done; 
+    ); 
+done
