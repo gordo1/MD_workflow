@@ -269,7 +269,7 @@ pausejob             - flag to stop jobs in event of something wrong.
 Note:  Actually most bad files are moved to /Errors with a suffix ".bad"
 You can remove them there with a "rm *.bad" command.  Use with caution!
 
-Once you have setset your directories, you can then simply restart the jobs using: 
+Once you have set your directories, you can then simply restart the jobs using: 
 
  ./custom_start_all_production_jobs.sh
    
@@ -295,7 +295,7 @@ Once you have setset your directories, you can then simply restart the jobs usin
 7.  Writeup, make movies.    /Project/
 
 - the /Project directory is all about writing up the associated manuscript
-  and making any illustrations or movies from the simualtion files. 
+  and making any illustrations or movies from the simulation files. 
 
 #-----------------------------------------------------------------------------# 
 
