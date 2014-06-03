@@ -1,11 +1,8 @@
-#!/usr/bin/env sh
-#################################################################################
-#   
-#   File Name: a5_bio3d_analyses.sh
-#   Created: Sun 25 May 20:33:53 2014
-#   Last Modified: Sun 25 May 21:06:25 2014
-#   Created By: Shane Gordon
-#
-################################################################################
+#!/usr/bin/env bash
+# AUTHOR:   Shane Gordon
+# FILE:     a5_bio3d_analyses.sh
+# ROLE:     TODO (some explanation)
+# CREATED:  2014-05-31 17:36:39
+# MODIFIED: 2014-05-31 17:36:59
 
-python ../Scripts/Analysis_Scripts/a5_bio3d_analyses.py
+R CMD BATCH ../Scripts/Analysis_Scripts/a5_bio3d_analyses.R
