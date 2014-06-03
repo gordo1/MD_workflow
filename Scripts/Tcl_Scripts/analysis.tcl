@@ -1,3 +1,21 @@
+#!/usr/bin/env tclsh
+# AUTHOR:   Shane Gordon
+# FILE:     analysis.tcl
+# ROLE:     TODO (some explanation)
+# CREATED:  2014-06-03 21:34:19
+# MODIFIED: 2014-06-03 22:02:27
+
+# DESCRIPTION
+proc saltbrscan { start end sel outdir } {
+        if { [ file isdirectory $outdir ] == 1 } {
+                puts "Output directory \"$outdir\" exists."
+        } else {
+                mkdir $outdir
+        }
+        package require saltbr
+        saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
+}
+
 # Go through each frame of the trajectory
 # Output a lot of information
 # a - atomselection on protein
