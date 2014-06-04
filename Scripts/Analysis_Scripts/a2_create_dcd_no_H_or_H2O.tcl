@@ -12,7 +12,7 @@ source combined_dcd_loader_script.vmd
 
 # load useful analysis script:  
 source ../Scripts/Tcl_Scripts/analysis.tcl
-source clustering_configuration.tcl 
+source ../Scripts/Analysis_Scripts/clustering_configuration.tcl 
 
 set frame_no [molinfo top get numframes]
 set num_all [$sel_all num ] 
@@ -50,18 +50,26 @@ fitframes top $sel_protein
 # write out aligned reduced data: 
 animate write dcd no_water_no_hydrogen.dcd waitfor all sel $sel_all
 
-#-- Some quick and easy things to caclulate:-----------------------------------
+#-- Some quick and easy things to calculate:-----------------------------------
 if {$calc_rog == 1} {
  puts " calculating radius of gyration of protein backbone: " 
  rgyrscan $sel_all  protein_radius_gyration.txt 
 }
 
 if {$calc_rmsf == 1} {
- puts " calculating rmsf of protein backbone "
- set sel_ca [atomselect top { protein and name CA } ]  
- rmsfscan $sel_ca rmsf_protein_backbone.txt
+        puts " calculating rmsf of protein backbone "
+        set sel_ca [atomselect top { protein and name CA } ]  
+        rmsfscan $sel_ca rmsf_protein_backbone.txt
+}
+
+if {$calc_rmsd == 1} {
+        puts " calculating rmsd of protein "
+        set seltext "noh protein"
+        rmsdscan $seltext top 0 -1
 }
 
 # clean up
 close $out
 
+# Exit VMD
+exit

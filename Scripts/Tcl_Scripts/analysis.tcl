@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-06-03 22:02:27
+# MODIFIED: 2014-06-04 14:11:08
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
@@ -345,6 +345,24 @@ proc write_seq { molid seltext fname } {
     }
     close $f
 }
+
+# trajectory rmsd scan to file
+proc rmsdscan { sel mol start end } {
+        fitframes $mol "$sel and backbone"
+        set reference [ atomselect $mol "$sel" frame 0 ]
+        set f [ open "rmsd_protein.txt" w ]
+        set compare [ atomselect $mol "$sel" ]
+        set numframe [ molinfo $mol get numframes ]
+        
+        puts $f "Frame_no. RMSD (A)"
+        for { set frame 0 } { $frame < $numframe } {incr frame} {
+                $compare frame $frame
+                set rmsd [ measure rmsd $compare $reference ]
+                puts $f "$frame $rmsd"
+        } 
+        close $f
+}
+
 
 # per residue rmsf to file
 proc rmsfscan { sel fname } {

@@ -32,7 +32,7 @@ set sel_all [atomselect top all]    ;# set "all" selection
 #-- Optional calculations: 0 no  1 yes ----------------------------------------------------------------------------
 set calc_rog  1   ;# calculate radius of gyration 
 set calc_rmsf 1   ;# calculate rmsf of residues
-
+set calc_rmsd 1   
 
 
 
