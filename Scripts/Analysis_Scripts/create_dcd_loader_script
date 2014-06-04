@@ -26,7 +26,7 @@ step_size=1
 cdir=`pwd`
 jobdir=`basename $cdir`
 basename=local_dcd_file_loader
-
+dcdfile=dcdfile_list
 # 
 cd OutputFiles
 
@@ -39,12 +39,13 @@ echo "" >$basename.vmd
 for dcdline in $(cat dcd_list.txt);
 do 
  printf "mol addfile ../MainJob_dir/%s/OutputFiles/%s type dcd first %s last %s step %s filebonds 1 autobonds 1 waitfor all\n" $jobdir $dcdline $first_frame $last_frame  $step_size >>$basename.vmd
+ printf "../MainJob_dir/%s/OutputFiles/%s\n" $jobdir $dcdline >>$dcdfile.txt
 done 
 
 #-- cleanup: 
 if [ -f dcd_list.txt ]; 
- then 
- rm dcd_list.txt
+then 
+        rm dcd_list.txt
 fi
 
 cd ../

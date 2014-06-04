@@ -17,6 +17,11 @@ then
 fi
 mkdir temp_data_dir
 
+if [ -f dcdfile_list.txt ];
+then
+        rm dcdfile_list.txt
+fi
+
 #-- write header to file: 
 echo "#!/usr/local/bin/vmd " >$combined.vmd
 echo "# VMD script written by save_state $Revision: 1.44 $" >>$combined.vmd
@@ -67,7 +72,9 @@ do
  ../../Scripts/Analysis_Scripts/create_dcd_loader_script 
 
 # merge files: 
- cat OutputFiles/local_dcd_file_loader.vmd  >> ../../Analysis/$combined.vmd 
+ cat OutputFiles/local_dcd_file_loader.vmd  >> ../../Analysis/$combined.vmd
+ cat OutputFiles/dcdfile_list.txt  >> ../../Analysis/dcdfile_list.txt
+ rm OutputFiles/dcdfile_list.txt
  cd ../
  
 done

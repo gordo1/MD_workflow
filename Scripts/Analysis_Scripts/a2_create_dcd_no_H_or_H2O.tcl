@@ -8,30 +8,21 @@ set out [open "summary.txt" a]
 # read in raw data: 
 puts " reading in entire data set:"
 source basic_vmd_setup.vmd
-source combined_dcd_loader_script.vmd 
 
 # load useful analysis script:  
 source ../Scripts/Tcl_Scripts/analysis.tcl
-source ../Scripts/Analysis_Scripts/clustering_configuration.tcl 
 
-set frame_no [molinfo top get numframes]
-set num_all [$sel_all num ] 
-set cha_all [get_charge $sel_all ] 
+# source combined_dcd_loader_script.vmd 
+mol new [ glob ../InputFiles/*psf ]
+mol addfile [ glob ../InputFiles/*pdb ]
 
-puts $out " Total charge:         $cha_all  " 
-puts $out " Total frame numbers:  $frame_no \n " 
-puts $out " Total atoms:          $num_all  " 
+set sel_all [atomselect top {not water and not hydrogen}]
+reduced $sel_all no_water_no_hydrogen
 
 #------------------------------------------------------------------------------
-puts " creating reduced selection of data: no water no hydrogen"
-
-set sel [atomselect top {not water and not hydrogen}]
-reduced $sel no_water_no_hydrogen
-set num_sel [$sel num]
-puts $out " Total reduced atoms:  $num_sel \n  " 
 
 # write out reduced data: 
-animate write dcd no_water_no_hydrogen.dcd waitfor all sel $sel
+# animate write dcd no_water_no_hydrogen.dcd waitfor all sel $sel
 
 puts " reading in reduced data"
 
@@ -39,7 +30,24 @@ puts " reading in reduced data"
 mol delete top
 mol new no_water_no_hydrogen.psf type {psf} first 0 last -1 step 1 waitfor all
 mol addfile no_water_no_hydrogen.dcd type {dcd} first 0 last -1 step 1 waitfor all
+
+source ../Scripts/Analysis_Scripts/clustering_configuration.tcl
 set sel_all [atomselect top {not water and not hydrogen}]
+
+puts " creating reduced selection of data: no water no hydrogen"
+
+set sel [atomselect top {not water and not hydrogen}]
+reduced $sel no_water_no_hydrogen
+set num_sel [$sel num]
+puts $out " Total reduced atoms:  $num_sel \n  "
+
+set frame_no [molinfo top get numframes]
+set num_all [$sel_all num ]
+set cha_all [get_charge $sel_all ]
+
+puts $out " Total charge:         $cha_all  "
+puts $out " Total frame numbers:  $frame_no \n "
+puts $out " Total atoms:          $num_all  "
 
 #------------------------------------------------------------------------------
 puts " aligning protein backbone in reduced data"

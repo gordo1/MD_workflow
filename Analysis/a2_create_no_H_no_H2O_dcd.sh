@@ -10,6 +10,8 @@
 
 # Launch script: 
 
+reduced="no_water_no_hydrogen"
+../Scripts/Tools/catdcd -o $reduced.dcd -otype dcd -s ../InputFiles/*.psf -stype psf -i $reduced.text $(cat dcdfile_list.txt) 
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.tcl
 
 # Gnuplot plotting functions
