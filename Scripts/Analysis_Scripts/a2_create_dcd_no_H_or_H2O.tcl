@@ -67,7 +67,7 @@ if {$calc_rog == 1} {
 if {$calc_rmsf == 1} {
         puts " calculating rmsf of protein backbone "
         set sel_ca [atomselect top { protein and name CA } ]  
-        rmsfscan $sel_ca rmsf_protein_backbone.txt
+        rmsfscan $sel_ca rmsf_protein_backbone
 }
 
 if {$calc_rmsd == 1} {
