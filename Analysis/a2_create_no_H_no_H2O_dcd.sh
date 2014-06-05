@@ -30,6 +30,11 @@ if [ -f $string.dcd ];
 then
         $catdcd_d -o $string.trr -otype trr -s $string.psf -stype psf -first 0 -last -1 -dcd $string.dcd;
         trjconv -f $string.trr -o $string.xtc;
+        # Clean up
+        if [ -f \#$string.xtc*\# ];
+        then
+                rm \#$string.xtc*\#
+        fi
         rm \#$string.xtc*\#
 else
         echo "File \"$string.dcd\" wasn't found. Eep!"
