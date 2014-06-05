@@ -35,7 +35,6 @@ then
         then
                 rm \#$string.xtc*\#
         fi
-        rm \#$string.xtc*\#
 else
         echo "File \"$string.dcd\" wasn't found. Eep!"
 fi
