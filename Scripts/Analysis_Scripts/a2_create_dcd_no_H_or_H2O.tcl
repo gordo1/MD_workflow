@@ -1,6 +1,11 @@
-#                                                                mk  Jan 2013 
-# This tcl script is used to generate a reduced selection (not water) by using 
-# the analysis.tcl script for easier analysis on machines with less memory. 
+#!/usr/bin/env tclsh
+# AUTHOR:   Shane Gordon
+# FILE:     /home/gordo/Desktop/WT_APOE3/Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O1.tcl
+# ROLE:     This tcl script is used to generate a reduced selection (not water) by using 
+#           the analysis.tcl script for easier analysis on machines with less memory.
+# CREATED:  2014-06-06 15:43:25
+# MODIFIED: 2014-06-06 15:43:25
+
 #------------------------------------------------------------------------------
 # open output file:
 set out [open "summary.txt" a]
