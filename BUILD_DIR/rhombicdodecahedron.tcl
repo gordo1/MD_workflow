@@ -65,12 +65,12 @@ proc dmax_alt {selection {inc 1}} {
 #
 ################################################################
 
-set psf         xxx.psf
-set pdb         xxx.pdb
+#set psf         xxx.psf
+#set pdb         xxx.pdb
 set prefix      W
 set inc         5
 set box         box
-set rbddh       zzz
+#set rbddh       zzz
 set padding     12.0
 package require psfgen
 
@@ -143,4 +143,4 @@ puts $fh "cellBasisVector1 $D 0.0 0.0"
 puts $fh "cellBasisVector2 0.0 $D 0.0"
 puts $fh  "cellBasisVector3 [expr $D/2] [expr $D/2] [expr $D/sqrt(2)]"
 close $fh
-exit
+#exit

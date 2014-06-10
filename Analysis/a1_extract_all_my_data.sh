@@ -7,7 +7,7 @@
 # 
 # launch script: 
 
- vmd -dispdev text -e ../Scripts/Analysis_Scripts/a1_extract_all_dcd_data.tcl
+ vmd -dispdev text -e ../Scripts/Analysis_Scripts/a1_extract_all_dcd_data.tcl >/dev/null
  ../Scripts/Analysis_Scripts/a1_extract_all_dcd_data
 
 # 

@@ -14,10 +14,9 @@ source ../Scripts/common_functions.sh
 reduced="no_water_no_hydrogen"
 echo "Reading in data set..."
 echo "Writing reduced selection..."
-../Scripts/Tools/catdcd -o $reduced.dcd -otype dcd -s ../InputFiles/*.psf -stype psf -i $reduced.text $(cat dcdfile_list.txt) > /dev/null
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.tcl
 
-# Gnuplot plotting functions
+# Some useful plots
 
 GNUPLOTTEMPLATE="../Scripts/Gnuplot_Scripts/template.gpi"
 gnuplot -e "FILE='./rmsf_protein_backbone.txt'" -e "OUTPUT='./rmsf_protein_backbone.pdf'" -e "YLABEL='RMSF (Angstrom)'" -e "XLABEL='Residue No.'" $GNUPLOTTEMPLATE
@@ -28,25 +27,29 @@ gnuplot -e "FILE='./protein_radius_gyration.txt'" -e "OUTPUT='./protein_radius_g
 
 catdcd_d="../Scripts/Tools/catdcd"
 string="no_water_no_hydrogen"
-
-if [ -f $string.dcd ];
+if [ -f $string.dcd ]
 then
         $catdcd_d -o $string.trr -otype trr -s $string.psf -stype psf -first 0 -last -1 -dcd $string.dcd >/dev/null;
         trjconv -quiet -f $string.trr -o $string.xtc;
         # Clean up
-        if [ -f \#$string.xtc*\# ];
+        if [ -f \#$string.xtc*\# ]
         then
                 rm \#$string.xtc*\#
+        else
+                echo "" # OK
         fi
-else
-        echo "File \"$string.dcd\" wasn't found. Eep!"
+        if [ -f $string.trr ]
+        then
+                rm $string.trr
+        fi
 fi
 
+# making sure that output files are all there
 if [ -f $string.xtc ];
 then
         echo "Everything seems to have worked."
 else
-        echo "File \"$string.trr\" wasn't found. Is \"trjconv\" installed under gromacs tools. If not, try installation using \'sudo apt-get install gromacs'"
+        echo "File \"$string.trr\" wasn't found. Is \"trjconv\" installed under gromacs tools. If not, try installation using \'sudo apt-get install gromacs\'"
 fi
 
 #

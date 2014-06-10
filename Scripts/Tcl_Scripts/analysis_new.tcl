@@ -1,21 +1,3 @@
-#!/usr/bin/env tclsh
-# AUTHOR:   Shane Gordon
-# FILE:     analysis.tcl
-# ROLE:     TODO (some explanation)
-# CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-06-10 16:39:09
-
-# DESCRIPTION
-proc saltbrscan { start end sel outdir } {
-        if { [ file isdirectory $outdir ] == 1 } {
-                puts "Output directory \"$outdir\" exists."
-        } else {
-                mkdir $outdir
-        }
-        package require saltbr
-        saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
-}
-
 # Go through each frame of the trajectory
 # Output a lot of information
 # a - atomselection on protein
@@ -346,34 +328,36 @@ proc write_seq { molid seltext fname } {
     close $f
 }
 
-# trajectory rmsd scan to file
-proc rmsdscan { sel mol start end } {
-        fitframes $mol "$sel and backbone"
-        set reference [ atomselect $mol "$sel" frame 0 ]
-        set f [ open "rmsd_protein.txt" w ]
-        set compare [ atomselect $mol "$sel" ]
-        set numframe [ molinfo $mol get numframes ]
-        
-        puts $f "Frame_no. RMSD (A)"
-        for { set frame 0 } { $frame < $numframe } {incr frame} {
-                $compare frame $frame
-                set rmsd [ measure rmsd $compare $reference ]
-                puts $f "$frame $rmsd"
-        } 
-        close $f
-}
-
-
 # per residue rmsf to file
 proc rmsfscan { sel fname } {
     set rmsf [measure rmsf $sel]
     set n [llength $rmsf]
-    set f [open $fname.txt "w"]
-    for {set i 1} {$i < $n} {incr i} {
+    set f [open $fname.dat "w"]
+    for {set i 0} {$i < $n} {incr i} {
 	puts $f "$i [lindex $rmsf $i]"
     }
     close $f
 }
+
+
+# rmsd scan:                                                mk  
+# - measure rmsd of ligand selection over frames of trajectory.   
+
+proc rmsdscan { lig_sel fname } {
+    set ref [atomselect top $lig_sel frame 0]
+    set sel [atomselect top $lig_sel ]
+
+    set n [molinfo top get numframes]
+    set f [open $fname.dat "w"]
+
+    for { set i 0 } { $i < $n } { incr i } {
+        $sel frame $i
+        set rmsd [measure rmsd $ref $sel] 
+	puts $f "$i \t$rmsd "
+    }
+   close $f
+}
+
 
 proc switch_on_tube_scaling { {field beta}} {
     set env(VMDMODULATERIBBON) $field
@@ -423,16 +407,4 @@ proc twitch_reps {molid} {
     mol selection "name O"
     mol addrep $molid
     mol smoothrep $molid 1 20
-}
-
-# basic conditional filecheck
-proc outputcheck { filename } {
-        if { [ file exists "$filename" ] } {
-                puts " File \"$filename\" has been created successfully"
-        } else {
-                puts " File \"$filename\" was NOT found."
-                puts " Something has gone wrong here..."
-                puts " Exiting prematurely"
-                exit
-        }
 }
