@@ -3,14 +3,14 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-06-10 16:39:09
+# MODIFIED: 2014-06-11 10:23:13
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
         if { [ file isdirectory $outdir ] == 1 } {
                 puts "Output directory \"$outdir\" exists."
         } else {
-                mkdir $outdir
+                exec mkdir $outdir
         }
         package require saltbr
         saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
