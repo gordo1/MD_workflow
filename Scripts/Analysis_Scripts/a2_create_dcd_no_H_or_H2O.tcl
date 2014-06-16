@@ -52,68 +52,23 @@ set i 1
 foreach dcd $data {
         set sel_all [ atomselect top { noh protein } ]
         animate read dcd ${dcd} beg 0 end -1 waitfor all top
-        animate write dcd temp_$i.dcd beg 0 end -1 sel $sel_all waitfor all top
-        animate delete all
-        incr i
+        if { $i < 10 } {        
+                animate write dcd temp_000$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+                animate delete all
+                incr i
+        } elseif { $i < 100 } {
+                animate write dcd temp_00$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+                animate delete all
+                incr i
+        } elseif { $i < 1000 } {
+                animate write dcd temp_0$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+                animate delete all
+                incr i
+        } elseif { $i < 10000 } {
+                animate write dcd temp_$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+                animate delete all
+                incr i
+        }
 }
-
-puts " Concatenating reduced trajectory files..."
-for { set dcd_files 1 } { $dcd_files < [ expr $i - 1 ] } { incr dcd_files } {
-        set a [ expr $dcd_files + 1 ]
-        exec ../Scripts/Tools/catdcd -o temp_new.dcd temp_$dcd_files.dcd temp_$a.dcd
-        exec mv temp_new.dcd temp_$a.dcd
-        # cleaning up
-        file delete temp_$dcd_files.dcd
-}
-# write out reduced data: 
-exec mv temp_[ expr $i -1 ].dcd no_water_no_hydrogen.dcd
-outputcheck no_water_no_hydrogen.dcd
-mol delete all
-
-# taking reduced data set and aligning protein atoms
-mol new no_water_no_hydrogen.psf
-mol addfile no_water_no_hydrogen.dcd waitfor all
-
-source ../Scripts/Analysis_Scripts/clustering_configuration.tcl
-set sel [atomselect top "$reduced_sel"]
-
-puts " creating reduced selection of data: no water no hydrogen"
-
-#------------------------------------------------------------------------------
-puts " aligning protein backbone in reduced data"
-
-# fit reduced data to first frame and protein backbone: 
-fitframes top "$reduced_sel"
-
-# write out aligned reduced data: 
-animate write dcd no_water_no_hydrogen.dcd beg 0 end -1 sel $sel waitfor all
-outputcheck no_water_no_hydrogen.dcd
-
-mol delete all
-
-mol new no_water_no_hydrogen.psf
-mol addfile no_water_no_hydrogen.dcd waitfor all
-
-#-- Some quick and easy things to calculate:-----------------------------------
-if {$calc_rog == 1} {
- puts " calculating radius of gyration of protein backbone: " 
-        set sel [atomselect top "protein and backbone" ]  
-        rgyrscan $sel protein_radius_gyration.txt 
-}
-
-if {$calc_rmsf == 1} {
-        puts " calculating rmsf of protein backbone "
-        set sel_ca [atomselect top "protein and name CA" ]  
-        rmsfscan $sel_ca rmsf_protein_backbone
-}
-
-if {$calc_rmsd == 1} {
-        puts " calculating rmsd of protein "
-        set seltext "protein and backbone"
-        rmsdscan $seltext top 0 -1
-}
-# clean up
-close out
-
 # Exit VMD
 exit

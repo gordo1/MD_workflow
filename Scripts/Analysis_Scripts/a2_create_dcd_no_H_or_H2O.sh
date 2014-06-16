@@ -15,6 +15,15 @@ reduced="no_water_no_hydrogen"
 echo "Reading in data set..."
 echo "Writing reduced selection..."
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.tcl
+echo " Merging reduced data..."
+../Scripts/Tools/catdcd -otype dcd -o no_water_no_hydrogen.dcd temp_*.dcd
+rm temp_*.dcd
+if [ -f no_water_no_hydrogen.dcd ]
+then
+        vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O_2.tcl
+else
+        exit
+fi
 
 # Some useful plots
 
