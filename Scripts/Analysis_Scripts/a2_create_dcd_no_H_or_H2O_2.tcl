@@ -14,7 +14,7 @@ set out [open "summary.txt" a]
 # load useful analysis script:  
 source ../Scripts/Tcl_Scripts/analysis.tcl
 
-set reduced_sel "noh protein"
+set reduced_sel "protein"
 set sel_all [ atomselect top "$reduced_sel" ]
 
 #------------------------------------------------------------------------------

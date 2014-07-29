@@ -5,6 +5,7 @@
 #           the analysis.tcl script for easier analysis on machines with less memory.
 # CREATED:  2014-06-06 15:43:25
 # MODIFIED: 2014-06-06 15:43:25
+# NOTE: Hydrogens have now been left in the reduced files. Needed for some analysis steps
 
 #------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ source ../Scripts/Tcl_Scripts/analysis.tcl
 mol new [ glob ../InputFiles/*psf ]
 mol addfile [ glob ../InputFiles/*pdb ]
 
-set reduced_sel "noh protein"
+set reduced_sel "protein"
 set sel_all [ atomselect top "$reduced_sel" ]
 reduced $sel no_water_no_hydrogen
 set num_sel [$sel num]
@@ -50,7 +51,7 @@ set data [ split $file_data "\n" ]
 mol new [ glob ../InputFiles/*psf ]
 set i 1
 foreach dcd $data {
-        set sel_all [ atomselect top { noh protein } ]
+        set sel_all [ atomselect top $reduced_sel ]
         animate read dcd ${dcd} beg 0 end -1 waitfor all top
         if { $i < 10 } {        
                 animate write dcd temp_000$i.dcd beg 0 end -1 sel $sel_all waitfor all top
