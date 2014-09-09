@@ -3,9 +3,9 @@
 # FILE:     a5_other_analyses.sh
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:02:52
-# MODIFIED: 2014-09-09 11:59:07
+# MODIFIED: 2014-09-09 16:25:36
 
-# vmd -dispdev text -e ../Scripts/Analysis_Scripts/a5_other_analyses.tcl
+vmd -dispdev text -e ../Scripts/Analysis_Scripts/a5_other_analyses.tcl
 
 # Some useful plots
 

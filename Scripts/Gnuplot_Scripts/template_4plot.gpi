@@ -3,7 +3,7 @@
 # FILE:     template.gpi
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-09-09 10:10:34
-# MODIFIED: 2014-09-09 12:07:53
+# MODIFIED: 2014-09-09 16:19:51
 
 #set terminal xterm font "Helvetica, 12" enhanced
 set style data lines
@@ -14,8 +14,8 @@ set macros
 # Formatting styles
 AXISFONTSIZE = '18'
 TICSIZE = '16'
-FONT = 'Helvetica'
-BORDERWIDTH = '1'
+FONT = 'Arial'
+BORDERWIDTH = '5'
 
 # Set font style for figure title, axis labels"
 set xtics out scale 2 font "FONT, TICSIZE"
@@ -31,10 +31,6 @@ set style line 3 lc rgb '#5e9c36' lt 1 lw 2 pt 9    #green
 set style line 4 lc rgb "orange" lt 1 lw 2 pt 11   #orange
 BLUE = "1"
 RED = "2"
-
-# Terminal switches
-AXISFONTSIZE='18'
-TICSIZE='16'
 
 # Plot 1
 set term pdfcairo enhanced color dashed size 8.27,11.69

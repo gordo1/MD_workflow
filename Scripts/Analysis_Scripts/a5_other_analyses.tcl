@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:04:49
-# MODIFIED: 2014-09-09 11:31:24
+# MODIFIED: 2014-09-09 15:51:00
 
 source ../Scripts/Analysis_Scripts/clustering_configuration.tcl
 
@@ -22,6 +22,7 @@ source ../Scripts/Tcl_Scripts/analysis.tcl
 set frame_no [molinfo top get numframes]
 
 # Calculates all salt bridges formed during the simulation
+ss_calc top 0 [ expr [ molinfo top get numframes ] ] 10
 sasa_scan "protein" protein_sasa.txt 10
 saltbr 0 -1 [ atomselect top "protein" ] SaltBridges
 

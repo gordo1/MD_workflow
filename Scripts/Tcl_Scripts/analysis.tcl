@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-09-09 11:41:28
+# MODIFIED: 2014-09-09 15:47:04
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
@@ -457,12 +457,13 @@ proc ss_calc { molid start end stride } {
     } else {
            file  mkdir "./SecondaryStructure"
     }
-    # Calculation bit
+    # # Calculation bit
     puts "Getting secondary structure information." 
     set fd [open "sec_structure.dat" w ] 
     set protCA [atomselect 0 "protein name CA"] 
-    set numRes [llength [$protCA get resid]] 
-    for {set i $start } { $i < $end } { incr i $stride } { 
+    set numRes [llength [$protCA get resid]]
+    puts "$start $end"
+    for { set i $start } { $i < $end } { incr i $stride } { 
         $protCA frame $i 
         $protCA update 
         animate goto $i
