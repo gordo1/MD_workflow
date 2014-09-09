@@ -1,9 +1,9 @@
-#!/usr/bin/env tclsh
+#!/usr/bin/tclsh
 # AUTHOR:   Shane Gordon
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-06-10 16:39:09
+# MODIFIED: 2014-09-09 11:41:28
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
@@ -358,7 +358,7 @@ proc write_seq { molid seltext fname } {
 }
 
 # trajectory rmsd scan to file
-proc rmsdscan { sel mol start end } {
+proc rmsdscan { sel mol } {
         fitframes $mol "$sel and backbone"
         set reference [ atomselect $mol "$sel" frame 0 ]
         set f [ open "rmsd_protein.txt" w ]
@@ -447,3 +447,51 @@ proc outputcheck { filename } {
                 exit
         }
 }
+
+proc ss_calc { molid start end stride } {
+    # Deletes old directory, if found
+    puts "Looking for old directory. If found, will delete it"
+    if { [ file exists "./SecondaryStructure" ] } {
+            file delete -force "./SecondaryStructure" 
+            file mkdir "./SecondaryStructure"
+    } else {
+           file  mkdir "./SecondaryStructure"
+    }
+    # Calculation bit
+    puts "Getting secondary structure information." 
+    set fd [open "sec_structure.dat" w ] 
+    set protCA [atomselect 0 "protein name CA"] 
+    set numRes [llength [$protCA get resid]] 
+    for {set i $start } { $i < $end } { incr i $stride } { 
+        $protCA frame $i 
+        $protCA update 
+        animate goto $i
+        mol ssrecalc $molid 
+        set sscache_data($i) [$protCA get structure] 
+        set helix [llength [lsearch -all $sscache_data($i) H ]] 
+        set turn [llength [lsearch -all $sscache_data($i) T ]] 
+        set coil [llength [lsearch -all $sscache_data($i) C ]] 
+        set beta [llength [lsearch -all $sscache_data($i) B ]] 
+        puts "this is number of helix, turn, coil, and beta resids: $helix $turn $coil $beta" 
+        set helixPercent [expr { [llength [lsearch -all $sscache_data($i) H ]] / double($numRes)}] 
+        set turnPercent [expr { [llength [lsearch -all $sscache_data($i) T ]] / double($numRes)}] 
+        set coilPercent [expr { [llength [lsearch -all $sscache_data($i) C ]] / double($numRes)}] 
+        set betaPercent [expr { [llength [lsearch -all $sscache_data($i) B ]] / double($numRes)}] 
+        puts "betapercent $betaPercent" 
+        puts "coilpercent $coilPercent" 
+        puts "helixpercent $helixPercent" 
+        puts "turnpercent $turnPercent" 
+        lappend ThelixPercent $helixPercent 
+        lappend TturnPercent $turnPercent 
+        lappend TcoilPercent $coilPercent 
+        lappend TbetaPercent $betaPercent 
+        puts $fd $sscache_data($i) 
+        puts "Structure: $i" 
+        } 
+    close $fd 
+    $protCA delete 
+    write_vector $ThelixPercent ./SecondaryStructure/helixPercent.plt 
+    write_vector $TturnPercent ./SecondaryStructure/turnPercent.plt 
+    write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt 
+    write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt 
+    }
