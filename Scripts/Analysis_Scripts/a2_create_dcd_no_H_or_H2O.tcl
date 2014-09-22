@@ -30,11 +30,11 @@ set num_sel [$sel num]
 set cha_all [get_charge $sel_all ]
 puts $out " Total reduced atoms:  $num_sel \n  "
 puts $out " Total charge:         $cha_all  "
+close $out
 
 #------------------------------------------------------------------------------
 
 # write out reduced data: 
-# animate write dcd no_water_no_hydrogen.dcd waitfor all sel $sel
 
 puts " reading in reduced data..."
 
@@ -71,5 +71,37 @@ foreach dcd $data {
                 incr i
         }
 }
-# Exit VMD
+
+#------------------------------------------------------------------------------
+
+set reduced_sel "protein"
+set sel_all [ atomselect top "$reduced_sel" ]
+mol delete all
+
+#------------------------------------------------------------------------------
+
+# write out reduced data: 
+outputcheck no_water_no_hydrogen.dcd
+
+# taking reduced data set and aligning protein atoms
+mol new no_water_no_hydrogen.psf
+mol addfile no_water_no_hydrogen.dcd waitfor all
+
+source ../Scripts/Analysis_Scripts/clustering_configuration.tcl
+set sel [atomselect top "$reduced_sel"]
+
+puts " creating reduced selection of data: no water no hydrogen"
+
+#------------------------------------------------------------------------------
+puts " aligning protein backbone in reduced data"
+
+# fit reduced data to first frame and protein backbone: 
+fitframes top "$reduced_sel"
+
+# write out aligned reduced data: 
+animate write dcd no_water_no_hydrogen.dcd beg 0 end -1 sel $sel waitfor all
+outputcheck no_water_no_hydrogen.dcd
+
+mol delete all
+
 exit

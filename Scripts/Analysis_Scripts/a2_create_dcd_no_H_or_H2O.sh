@@ -17,48 +17,6 @@ echo "Writing reduced selection..."
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.tcl
 echo " Merging reduced data..."
 ../Scripts/Tools/catdcd -otype dcd -o no_water_no_hydrogen.dcd temp_*.dcd
+
+# Clean up any temp files used in concatenating trajectories
 rm temp_*.dcd
-if [ -f no_water_no_hydrogen.dcd ]
-then
-        vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O_2.tcl
-else
-        exit
-fi
-
-# Some useful plots
-
-GNUPLOTTEMPLATE="../Scripts/Gnuplot_Scripts/template.gpi"
-gnuplot -e "FILE='./rmsf_protein_backbone.txt'" -e "OUTPUT='./rmsf_protein_backbone.pdf'" -e "YLABEL='RMSF (Angstrom)'" -e "XLABEL='Residue No.'" $GNUPLOTTEMPLATE
-gnuplot -e "FILE='./rmsd_protein.txt'" -e "OUTPUT='./rmsd_protein.pdf'" -e "YLABEL='RMSD (Angstrom)'" -e "XLABEL='Frame No.'" $GNUPLOTTEMPLATE
-gnuplot -e "FILE='./protein_radius_gyration.txt'" -e "OUTPUT='./protein_radius_gyration.pdf'" -e "YLABEL='R_g (Angstrom)'" -e "XLABEL='Frame No.'" $GNUPLOTTEMPLATE
-
-# Create Gromacs-compatible tarjectory file for analysis
-
-catdcd_d="../Scripts/Tools/catdcd"
-string="no_water_no_hydrogen"
-if [ -f $string.dcd ]
-then
-        $catdcd_d -o $string.trr -otype trr -s $string.psf -stype psf -first 0 -last -1 -dcd $string.dcd >/dev/null;
-        trjconv -quiet -f $string.trr -o $string.xtc;
-        # Clean up
-        if [ -f \#$string.xtc*\# ]
-        then
-                rm \#$string.xtc*\#
-        else
-                echo "" # OK
-        fi
-        if [ -f $string.trr ]
-        then
-                rm $string.trr
-        fi
-fi
-
-# making sure that output files are all there
-if [ -f $string.xtc ];
-then
-        echo "Everything seems to have worked."
-else
-        echo "File \"$string.trr\" wasn't found. Is \"trjconv\" installed under gromacs tools. If not, try installation using \'sudo apt-get install gromacs\'"
-fi
-
-#
