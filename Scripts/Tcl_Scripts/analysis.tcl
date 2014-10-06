@@ -3,17 +3,17 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-09-22 10:28:29
+# MODIFIED: 2014-10-06 11:21:19
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
   if { [ file isdirectory $outdir ] == 1 } {
     puts "Output directory \"$outdir\" exists."
-      } else {
-        exec mkdir $outdir
-      }
-      package require saltbr
-      saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
+    } else {
+      exec mkdir $outdir
+    }
+    package require saltbr
+    saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
 }
 
 proc sasa_scan { seltext outfile incr } {
@@ -23,8 +23,8 @@ proc sasa_scan { seltext outfile incr } {
   for { set frame 0 } { $frame < $nf } { incr frame $incr } {
     $sel frame $frame
     puts $sink "$frame [ measure sasa 1.4 $sel ]"
-      }
-      close $sink
+    }
+    close $sink
 }
 
 # Go through each frame of the trajectory
@@ -59,12 +59,12 @@ proc trajscan {a b {r 2.0}} {
         for {set k 0} {$k < [llength $protein_resid]} {incr k} {
           set sub_select [atomselect top "$protein_text and resid [lindex $protein_resid $k]"]
           append output_string " [lindex $protein_resid $k] [lsort -unique [$sub_select get resname]]"
-      }
-      puts $output_string
-      }
-  }
-  }
-  molinfo top set frame $oldframe
+    }
+    puts $output_string
+    }
+}
+}
+molinfo top set frame $oldframe
 }
 
 # As above, but just return minimal information on the number of
@@ -78,15 +78,15 @@ proc trajscanstat {a b {r 2.0}} {
     set contact [measure contacts $r $a $b]
     if {[llength [lindex $contact 0]] > 0} {
       incr count
-  }
-  }
-  molinfo top set frame $oldframe
-  puts "============================================="
-  puts "$count hits"
-  puts "[molinfo top get numframes] frames"
-  set ratio [expr double($count) / double($nframe)]
-  puts "ratio: $ratio"
-  puts "============================================="
+}
+}
+molinfo top set frame $oldframe
+puts "============================================="
+puts "$count hits"
+puts "[molinfo top get numframes] frames"
+set ratio [expr double($count) / double($nframe)]
+puts "ratio: $ratio"
+puts "============================================="
 }
 
 # As trajscanstat, but a list of protein atom selections is passed in.
@@ -105,21 +105,21 @@ proc trajscanstatm {alist b {r 2.0}} {
       set contact [measure contacts $r $a $b]
       if {[llength [lindex $contact 0]] > 0} {
         incr count
-      }
-  }
-  if {$count == $nselect} {
-    incr hits
-    lappend hitlist $i
-  }
-  }
-  molinfo top set frame $oldframe
-  puts "============================================="
-  puts "$hits hits"
-  puts "[molinfo top get numframes] frames"
-  set ratio [expr double($hits) / double($nframe)]
-  puts "ratio: $ratio"
-  puts "============================================="
-  return $hitlist
+    }
+}
+if {$count == $nselect} {
+  incr hits
+  lappend hitlist $i
+}
+}
+molinfo top set frame $oldframe
+puts "============================================="
+puts "$hits hits"
+puts "[molinfo top get numframes] frames"
+set ratio [expr double($hits) / double($nframe)]
+puts "ratio: $ratio"
+puts "============================================="
+return $hitlist
 }
 
 # Go through each frame of a trajectory and output the vector
@@ -131,26 +131,26 @@ proc mbondscan {a b {fname "noFile"}} {
   set nframe [molinfo top get numframes]
   if {$fname == "noFile"} {
     set writeFile 0
-  } else {
-    set fh [open $fname "w"]
-    set writeFile 1
-  }
-  for {set i 0} {$i < $nframe} {incr i} {
-    molinfo top set frame $i
-    set coma [lindex [measure inertia $a] 0]
-    set comb [lindex [measure inertia $b] 0]
-    set ab [vecsub $comb $coma]
-    set rab [vecdist $comb $coma]
-    if {$writeFile==1} {
-      puts $fh "$i $rab $ab"
-  } else {
-    puts "$i $rab $ab"
-  }
-  }
+} else {
+  set fh [open $fname "w"]
+  set writeFile 1
+}
+for {set i 0} {$i < $nframe} {incr i} {
+  molinfo top set frame $i
+  set coma [lindex [measure inertia $a] 0]
+  set comb [lindex [measure inertia $b] 0]
+  set ab [vecsub $comb $coma]
+  set rab [vecdist $comb $coma]
   if {$writeFile==1} {
-    close $fh
-  }
-  molinfo top set frame $oldframe
+    puts $fh "$i $rab $ab"
+} else {
+  puts "$i $rab $ab"
+}
+}
+if {$writeFile==1} {
+  close $fh
+}
+molinfo top set frame $oldframe
 }
 
 proc inertiascan {a b fnamedist fnameangle } {
@@ -169,10 +169,10 @@ proc inertiascan {a b fnamedist fnameangle } {
     set dotab [vecdot $orienta $orientb]
     puts $fdist "$rab"
     puts $fangle "[expr {acos([expr {abs($dotab)}])}]"
-  }
-  close $fdist
-  close $fangle
-  molinfo top set frame $oldframe
+}
+close $fdist
+close $fangle
+molinfo top set frame $oldframe
 }
 
 # Go through each frame of a trajectory and output the angle between
@@ -184,32 +184,32 @@ proc anglescan {a b c {fname "noFile"} } {
   set nframe [molinfo top get numframes]
   if {$fname == "noFile"} {
     set writeFile 0
-  } else {
-    set fh [open $fname "w"]
-    set writeFile 1
-  }
-  for {set i 0} {$i < $nframe} {incr i} {
-    molinfo top set frame $i
-    set coma [lindex [measure inertia $a] 0]
-    set comb [lindex [measure inertia $b] 0]
-    set comc [lindex [measure inertia $c] 0]
-    set ab [vecsub $comb $coma]
-    set bc [vecsub $comc $comb]
-    set dab [vecnorm $ab]
-    set dbc [vecnorm $bc]
-    set cos_abc [vecdot $dab $dbc]
-    set abc [expr { acos($cos_abc) }]
-    set aabc [expr { 180*$abc/3.14159265358979323846} ]
-    if {$writeFile==1} {
-      puts $fh "$aabc $abc"
-  } else {
-    puts "$aabc $abc"
-  }
-  }
+} else {
+  set fh [open $fname "w"]
+  set writeFile 1
+}
+for {set i 0} {$i < $nframe} {incr i} {
+  molinfo top set frame $i
+  set coma [lindex [measure inertia $a] 0]
+  set comb [lindex [measure inertia $b] 0]
+  set comc [lindex [measure inertia $c] 0]
+  set ab [vecsub $comb $coma]
+  set bc [vecsub $comc $comb]
+  set dab [vecnorm $ab]
+  set dbc [vecnorm $bc]
+  set cos_abc [vecdot $dab $dbc]
+  set abc [expr { acos($cos_abc) }]
+  set aabc [expr { 180*$abc/3.14159265358979323846} ]
   if {$writeFile==1} {
-    close $fh
-  } 
-  molinfo top set frame $oldframe
+    puts $fh "$aabc $abc"
+} else {
+  puts "$aabc $abc"
+}
+}
+if {$writeFile==1} {
+  close $fh
+} 
+molinfo top set frame $oldframe
 }
 
 # Go through each frame of a trajectory and calculate the radius of
@@ -220,23 +220,23 @@ proc rgyrscan { a {fname "noFile"} } {
   set nframe [molinfo top get numframes]
   if {$fname == "noFile"} {
     set writeFile 0
-  } else {
-    set fh [open $fname "w"]
-    set writeFile 1
-  }
-  for {set i 0} {$i < $nframe} {incr i} {
-    molinfo top set frame $i
-    set rg [ measure rgyr $a]
-    if {$writeFile==1} {
-      puts $fh "$i $rg"
-  } else {
-    puts "$i $rg"
-  }
-  }
+} else {
+  set fh [open $fname "w"]
+  set writeFile 1
+}
+for {set i 0} {$i < $nframe} {incr i} {
+  molinfo top set frame $i
+  set rg [ measure rgyr $a]
   if {$writeFile==1} {
-    close $fh
-  } 
-  molinfo top set frame $oldframe
+    puts $fh "$i $rg"
+} else {
+  puts "$i $rg"
+}
+}
+if {$writeFile==1} {
+  close $fh
+} 
+molinfo top set frame $oldframe
 }
 
 
@@ -249,37 +249,37 @@ proc dihedralscan { a b c d {fname "noFile"} } {
   set nframe [molinfo top get numframes]
   if {$fname == "noFile"} {
     set writeFile 0
-  } else {
-    set fh [open $fname "w"]
-    set writeFile 1
-  }
-  for {set i 0} {$i < $nframe} {incr i} {
-    molinfo top set frame $i
-    set coma [lindex [measure inertia $a] 0]
-    set comb [lindex [measure inertia $b] 0]
-    set comc [lindex [measure inertia $c] 0]
-    set comd [lindex [measure inertia $d] 0]
-    set ab [vecsub $comb $coma]
-    set bc [vecsub $comc $comb]
-    set cd [vecsub $comd $comc]
-    set dab [vecnorm $ab]
-    set dbc [vecnorm $bc]
-    set dcd [vecnorm $cd]
-    set cross_abbc [veccross $dab $dbc]
-    set cross_bccd [veccross $dbc $dcd]
-    set cos_abcd [vecdot $cross_abbc $cross_bccd]
-    set abcd [expr { acos($cos_abcd) }]
-    set aabcd [expr { 180*$abcd/3.14159265358979323846} ]
-    if {$writeFile==1} {
-      puts $fh "$i $aabcd $abcd"
-  } else {
-    puts "$i $aabcd $abcd"
-  }
-  }
+} else {
+  set fh [open $fname "w"]
+  set writeFile 1
+}
+for {set i 0} {$i < $nframe} {incr i} {
+  molinfo top set frame $i
+  set coma [lindex [measure inertia $a] 0]
+  set comb [lindex [measure inertia $b] 0]
+  set comc [lindex [measure inertia $c] 0]
+  set comd [lindex [measure inertia $d] 0]
+  set ab [vecsub $comb $coma]
+  set bc [vecsub $comc $comb]
+  set cd [vecsub $comd $comc]
+  set dab [vecnorm $ab]
+  set dbc [vecnorm $bc]
+  set dcd [vecnorm $cd]
+  set cross_abbc [veccross $dab $dbc]
+  set cross_bccd [veccross $dbc $dcd]
+  set cos_abcd [vecdot $cross_abbc $cross_bccd]
+  set abcd [expr { acos($cos_abcd) }]
+  set aabcd [expr { 180*$abcd/3.14159265358979323846} ]
   if {$writeFile==1} {
-    close $fh
-  }
-  molinfo top set frame $oldframe	
+    puts $fh "$i $aabcd $abcd"
+} else {
+  puts "$i $aabcd $abcd"
+}
+}
+if {$writeFile==1} {
+  close $fh
+}
+molinfo top set frame $oldframe	
 }
 
 # Write the indexes for the selection, sel, to a file fname.text and
@@ -312,11 +312,11 @@ proc fitframes { molid seltext } {
     $sel frame $i
     $all frame $i
     $all move [measure fit $sel $ref]
-  }
-  $ref delete
-  $sel delete
-  $all delete
-  return
+}
+$ref delete
+$sel delete
+$all delete
+return
 }
 
 proc fitagainst { molid0 molid1 seltext } {
@@ -329,8 +329,8 @@ proc fitagainst { molid0 molid1 seltext } {
     $sel frame $i
     $all frame $i
     $all move [measure fit $sel $ref]
-  }
-  return
+}
+return
 }
 
 # for the given molid mark the beta column for the selection text to 1
@@ -353,8 +353,8 @@ proc write_seq { molid seltext fname } {
     set this_resname [lindex $this_data 1]
     set this_chain [lindex $this_data 2]
     puts $f "$this_resid $this_resname $this_chain"
-  }
-  close $f
+}
+close $f
 }
 
 # trajectory rmsd scan to file
@@ -370,8 +370,8 @@ proc rmsdscan { sel mol } {
     $compare frame $frame
     set rmsd [ measure rmsd $compare $reference ]
     puts $f "$frame $rmsd"
-      } 
-      close $f
+    } 
+    close $f
 }
 
 
@@ -382,8 +382,8 @@ proc rmsfscan { sel fname } {
   set f [open $fname.txt "w"]
   for {set i 1} {$i < $n} {incr i} {
     puts $f "$i [lindex $rmsf $i]"
-  }
-  close $f
+}
+close $f
 }
 
 proc switch_on_tube_scaling { {field beta}} {
@@ -401,8 +401,8 @@ proc split_chain_fragments { mol } {
     set chain [lsort -unique [$sel get chain]]
     $sel writepdb chain$chain\_fragment$frag.pdb
     $sel delete
-  }
-  $all delete
+}
+$all delete
 }
 
 # reads a two column: <resid> <data>
@@ -420,8 +420,8 @@ proc apply_beta_from_file {fname molid} {
       set sel [atomselect $molid "protein and resid $resid"]
       $sel set beta $rmsf
       $sel delete
-  }
-  }
+}
+}
 }
 
 # work on the assumption that there is only one representation for
@@ -440,12 +440,12 @@ proc twitch_reps {molid} {
 proc outputcheck { filename } {
   if { [ file exists "$filename" ] } {
     puts " File \"$filename\" has been created successfully"
-      } else {
-        puts " File \"$filename\" was NOT found."
-        puts " Something has gone wrong here..."
-        puts " Exiting prematurely"
-        exit
-      }
+    } else {
+      puts " File \"$filename\" was NOT found."
+      puts " Something has gone wrong here..."
+      puts " Exiting prematurely"
+      exit
+    }
 }
 
 proc ss_calc { molid start end stride } {
@@ -454,46 +454,42 @@ proc ss_calc { molid start end stride } {
   if { [ file exists "./SecondaryStructure" ] } {
     file delete -force "./SecondaryStructure" 
     file mkdir "./SecondaryStructure"
-  } else {
-    file  mkdir "./SecondaryStructure"
-  }
-  # # Calculation bit
-  puts "Getting secondary structure information." 
-  set fd [open "sec_structure.dat" w ] 
-  set protCA [atomselect 0 "protein name CA"] 
-  set numRes [llength [$protCA get resid]]
-  puts "$start $end"
-  for { set i $start } { $i < $end } { incr i $stride } { 
-    $protCA frame $i 
-    $protCA update 
-    animate goto $i
-    mol ssrecalc $molid 
-    set sscache_data($i) [$protCA get structure] 
-    set helix [llength [lsearch -all $sscache_data($i) H ]] 
-    set turn [llength [lsearch -all $sscache_data($i) T ]] 
-    set coil [llength [lsearch -all $sscache_data($i) C ]] 
-    set beta [llength [lsearch -all $sscache_data($i) B ]] 
-    puts "this is number of helix, turn, coil, and beta resids: $helix $turn $coil $beta" 
-    set helixPercent [expr { [llength [lsearch -all $sscache_data($i) H ]] / double($numRes)}] 
-    set turnPercent [expr { [llength [lsearch -all $sscache_data($i) T ]] / double($numRes)}] 
-    set coilPercent [expr { [llength [lsearch -all $sscache_data($i) C ]] / double($numRes)}] 
-    set betaPercent [expr { [llength [lsearch -all $sscache_data($i) B ]] / double($numRes)}] 
-    puts "betapercent $betaPercent" 
-    puts "coilpercent $coilPercent" 
-    puts "helixpercent $helixPercent" 
-    puts "turnpercent $turnPercent" 
-    lappend ThelixPercent $helixPercent 
-    lappend TturnPercent $turnPercent 
-    lappend TcoilPercent $coilPercent 
-    lappend TbetaPercent $betaPercent 
-    puts $fd $sscache_data($i) 
-    puts "Structure: $i" 
-      } 
-      close $fd 
-      $protCA delete 
-      write_vector $ThelixPercent ./SecondaryStructure/helixPercent.plt 
-      write_vector $TturnPercent ./SecondaryStructure/turnPercent.plt 
-      write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt 
-      write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt 
-  }
+} else {
+  file  mkdir "./SecondaryStructure"
+}
+# # Calculation bit
+puts "Getting secondary structure information." 
+set fd [open "sec_structure.dat" w ] 
+set protCA [atomselect 0 "protein name CA"] 
+set numRes [llength [$protCA get resid]]
+puts "$start $end"
+for { set i $start } { $i < $end } { incr i $stride } { 
+  puts "Processing Frame No $i of $end. Remaining frames: [expr $end - $i]" ;# Lets us know what point in the trajectory we're up to
+  $protCA frame $i 
+  $protCA update 
+  animate goto $i
+  mol ssrecalc $molid 
+  set sscache_data($i) [$protCA get structure] 
+  set helix [llength [lsearch -all $sscache_data($i) H ]] 
+  set turn [llength [lsearch -all $sscache_data($i) T ]] 
+  set coil [llength [lsearch -all $sscache_data($i) C ]] 
+  set beta [llength [lsearch -all $sscache_data($i) B ]] 
+  set helixPercent [expr { [llength [lsearch -all $sscache_data($i) H ]] / double($numRes)}] 
+  set turnPercent [expr { [llength [lsearch -all $sscache_data($i) T ]] / double($numRes)}] 
+  set coilPercent [expr { [llength [lsearch -all $sscache_data($i) C ]] / double($numRes)}] 
+  set betaPercent [expr { [llength [lsearch -all $sscache_data($i) B ]] / double($numRes)}] 
+  lappend ThelixPercent $helixPercent 
+  lappend TturnPercent $turnPercent 
+  lappend TcoilPercent $coilPercent 
+  lappend TbetaPercent $betaPercent 
+  puts $fd $sscache_data($i) 
+  puts "Structure: $i" 
+    } 
+    close $fd 
+    $protCA delete 
+    write_vector $ThelixPercent ./SecondaryStructure/helixPercent.plt 
+    write_vector $TturnPercent ./SecondaryStructure/turnPercent.plt 
+    write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt 
+    write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt 
+}
 
