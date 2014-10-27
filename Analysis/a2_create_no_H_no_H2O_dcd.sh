@@ -8,8 +8,4 @@
 # CREATED:  2014-06-03 13:32:45
 # MODIFIED: 2014-06-03 13:32:45
 
-# Launch script: 
-
 ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.sh
-
-#

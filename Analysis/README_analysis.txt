@@ -9,7 +9,7 @@ mkuiper@unimelb.edu.au
 
 #------------------------------------------------------------------------------
 
-The /Analysis directory is desigend to be used at the completion of a run as a
+The /Analysis directory is designed to be used at the completion of a run as a
 place to consolidate data and process the trajectory data. 
 
 There are a number of sub_directories and scripts here to help you do this: 
@@ -39,10 +39,3 @@ There are a number of sub_directories and scripts here to help you do this:
 
 The scripts above are designed to be run in order,  a1_, a2_, ..etc but certain 
 analysis can be omitted if necessary. 
-
-
-
-
-
-
-
