@@ -200,18 +200,16 @@ Launch the local rendering script:
 
 ```tcl
 ./local_render_tachyon
-```
+`````
 
-This takes a .dat file in /Inbox   moves it to /Temp,  generates the image which is put into /Frames
-
+This takes a .dat file in `/Inbox` moves it to `/Temp`,  generates the image which is put into `/Frames`
 
 **Editing the images to make a movie.**
 
 Many programs can be used to stitch together image frames to form a movie. (Blender, kino, after-effects, etc).
 
 Blender has a steep learning curve, but also has much functionality plus can be used for animation work. In this capacity we are only using blender as a video sequence editor.  
-
-Google “blender video editing “  for tutorials and videos on how to use the editor!  
+Google [blender video editing](https://www.google.com.au/search?q=blender+video+editing) for tutorials and videos on how to use the editor.
 
 Certain effects can be used in Blender such as merging video streams to create fade in/fade out cross 
-over effects.  All the images frames should be stored in RenderBox/Frames
+over effects.  All the images frames should be stored in `RenderBox/Frames`
