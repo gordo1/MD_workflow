@@ -1,6 +1,7 @@
 ﻿# MovieBox
 
 Original author: Mike Kuiper
+Amended by: Shane Gordon
 
 
 ### Synopsis
@@ -23,7 +24,7 @@ If using vmd for publications please cite:
 
 ### Workflow
 
-*Setting the scene.*
+**Setting the scene.**
 
 Start vmd in the appropriate resolution for the type of movie you wish to make. 
 for example:  
@@ -61,6 +62,7 @@ each step, but this can be rather time consuming if you want to use fancy ambien
 occlusion lighting effects. The new approach is to write and save the plot.dat files, to be rendered later on a cluster or desktop.  (Using the RenderBox subdirectory).  
 
 *New GUI in vmd*
+
 As of VMD version 1.9.1,  there is a new GUI to be found under: 
 Extensions -> Visualization -> ViewChangeRender
 
@@ -141,7 +143,7 @@ move_vp_render start end first_frame_num dirName filePrefixName morph_frames  st
 #           smooth, sharp, smooth_start, smooth_end, tumble, and ninja  
 ```
 
-*Making movie script / generating plot files.*
+**Making movie script / generating plot files.**
 
 We can put a number of these render commands into a script and play them from the Tk console.  
 An example movie script is found in: MovieBox/Scripts/movie_script_example_01.tcl 
@@ -165,7 +167,7 @@ This would populate the directory /movie_frames with movie_segment_1.dat files f
 Display → Display Settings → Shadows (on) Amb. Occl. (on)
 
 
-*Rendering the plot.dat files*
+**Rendering the plot.dat files**
 
 In order to render the frames we've just generated we will use RenderBox_v1
 
@@ -205,7 +207,7 @@ Launch the local rendering script:
 This takes a .dat file in /Inbox   moves it to /Temp,  generates the image which is put into /Frames
 
 
-*Editing the images to make a movie.*
+**Editing the images to make a movie.**
 
 Many programs can be used to stitch together image frames to form a movie. (Blender, kino, after-effects, etc).
 
