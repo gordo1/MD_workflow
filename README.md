@@ -42,14 +42,16 @@ Original author: Mike Kuiper (VLSCI)
   to run for 2 nanoseconds, and we set our runs to be 20, then the production
   script will be run 20 times, producing:
   
-  $$
-  2 x 20 ns = 40 ns 
-  $$
-  ...worth of simulation
+  20 x 2 ns = 40 ns 
+
+  ...worth of simulation.
   
-  If we had set up say 4 simulation directories we would expect to generate 
-  4 times this of data, ie) 4x 2x 20 = 160ns.  As the production simulations 
-  run, a hidden counter in the simulation directory `.countdown.txt` keeps track 
+  If we had set up say 40 simulation directories we would expect to generate 
+  4 times this of data: 
+  
+  40 x 2 ns = 160 ns
+
+  As the production simulations run, a hidden counter in the simulation directory `.countdown.txt` keeps track 
   of the progress. The simulation stops once this counter reaches 0. 
 
   If we like how our simulations ran and want to extend the simulation, 
@@ -142,7 +144,7 @@ Original author: Mike Kuiper (VLSCI)
 
   to make sure you have things in place and calculate how much diskspace 
   you might use. (note! This script only properly calculates the diskspace 
-  used properly when run from MERRI as the catdcd is for x86 architecture) 
+      used properly when run from MERRI as the catdcd is for x86 architecture) 
   A number of sbatch templates and example namd config files are stored 
   here for you to modify for your specific job.  ie) 
 
@@ -169,7 +171,7 @@ Original author: Mike Kuiper (VLSCI)
   4. Create and prepare job directories.
 
   -From `/Setup\_and\_Config` use:
-  
+
   ```sh
   ./create\_job\_directories.sh
   ```
@@ -181,8 +183,8 @@ Original author: Mike Kuiper (VLSCI)
   ```
 
   to fill these directories with input files. (You can also use this 
-  script to update the input files in the job directories while a production 
-  run is running.) 
+      script to update the input files in the job directories while a production 
+      run is running.) 
 
 
   5. Run/manage  your jobs.          `/Top\_directory`
@@ -276,7 +278,7 @@ Original author: Mike Kuiper (VLSCI)
   assume that something when wrong at that step. Therefore the last "good" file is:
   `2012-09-06-17.52.calmodulin\_run2\_.6.dcd`
 
-  ...which we enter when prompted. (cut and paste works well here.) 
+...which we enter when prompted. (cut and paste works well here.) 
 
   Be careful to pick the last good file,  - data after that point will be removed
   and the last good restart files retrieved ready to restart the simulations from
