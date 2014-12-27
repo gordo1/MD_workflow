@@ -23,7 +23,7 @@ If using vmd for publications please cite:
 
 ### Workflow
 
-1. Setting the scene. 
+*Setting the scene.*
 
 Start vmd in the appropriate resolution for the type of movie you wish to make. 
 for example:  
@@ -51,7 +51,7 @@ This is so you can easily reproduce a particular state should something go wrong
 e.g.) Display -> Display Settings -> External Renderer Options -> shadows on -> Amb.Occl on (ambient occlusion)
 
 
-2. The molecular choreography
+*The molecular choreography*
 
 In this section we use a modified version of the vmd tcl script `view_change_render.tcl`
 
@@ -141,8 +141,7 @@ move_vp_render start end first_frame_num dirName filePrefixName morph_frames  st
 #           smooth, sharp, smooth_start, smooth_end, tumble, and ninja  
 ```
 
-
-3. Making movie script / generating plot files.   
+*Making movie script / generating plot files.*
 
 We can put a number of these render commands into a script and play them from the Tk console.  
 An example movie script is found in: MovieBox/Scripts/movie_script_example_01.tcl 
@@ -160,14 +159,13 @@ move_vp_render 1  2   1    movie_frames movie_segment_1  200   200    0 smooth;
 move_vp_render 2  2   201  movie_frames movie_segment_1  200     0  200 sharp;
 ```
 
-
 This would populate the directory /movie_frames with movie_segment_1.dat files for later rendering.  
 
 *Make sure to enable ambient occlusion lighting for fancy effects!*
 Display → Display Settings → Shadows (on) Amb. Occl. (on)
 
 
-4. Rendering the plot.dat files. 
+*Rendering the plot.dat files*
 
 In order to render the frames we've just generated we will use RenderBox_v1
 
@@ -207,7 +205,7 @@ Launch the local rendering script:
 This takes a .dat file in /Inbox   moves it to /Temp,  generates the image which is put into /Frames
 
 
-5. Editing the images to make a movie. 
+*Editing the images to make a movie.*
 
 Many programs can be used to stitch together image frames to form a movie. (Blender, kino, after-effects, etc).
 
