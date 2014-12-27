@@ -1,11 +1,19 @@
 # MD Workflow
 
+### Version
+
+v0.04
+
+
+### Foreword
+
 Original author: Mike Kuiper (VLSCI)
 
   **Disclaimer! - I have made this workflow originally to help manage my own
   projects, - you are free to use it, but it may not be entirely suitable for 
   what you are trying to achieve. Please email feedback, bugs or suggestions to:**
   <a href="mailto:mkuiper@unimelb.edu.au">mkuiper@unimelb.edu.au</a>
+
 
 ### Outline
 
