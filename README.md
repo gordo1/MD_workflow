@@ -40,7 +40,13 @@ Original author: Mike Kuiper (VLSCI)
   The variable *runs* will set how many times we run the production script. 
   For example, if in our `sim_production.conf` we set a simulation segment 
   to run for 2 nanoseconds, and we set our runs to be 20, then the production
-  script will be run 20 times, producing 2x20 ns = 40 ns worth of simulation. 
+  script will be run 20 times, producing:
+  
+  $$
+  2 x 20 ns = 40 ns 
+  $$
+  ...worth of simulation
+  
   If we had set up say 4 simulation directories we would expect to generate 
   4 times this of data, ie) 4x 2x 20 = 160ns.  As the production simulations 
   run, a hidden counter in the simulation directory `.countdown.txt` keeps track 
@@ -70,6 +76,7 @@ Original author: Mike Kuiper (VLSCI)
 
 ### Directory Structure Map Overview:
 
+  ```sh  
   |__Top_directory  
   |                -- The place for running simulations.	                 
   |                   Launch and control jobs from here. 
@@ -101,6 +108,7 @@ Original author: Mike Kuiper (VLSCI)
   |___Manuscripts   - a space for writing and storing images
   |___MovieBox	 - a space for rendering movies                       
   |___ProjectPlan   - A space to document and plan the project. 
+  ```
 
 ### The general work flow:
 
@@ -160,34 +168,45 @@ Original author: Mike Kuiper (VLSCI)
 
   4. Create and prepare job directories.
 
-  -From /Setup_and_Config use:
+  -From `/Setup\_and\_Config` use:
+  
+  ```sh
+  ./create\_job\_directories.sh
+  ```
 
-  ./create_job_directories.sh  
+  to create your job directories in `/MainJob\_dir` use:
 
-  to create your job directories in /MainJob_dir use:
+  ```sh
+  ./populate_config_files.sh
+  ```
 
-  ./populate_config_files.sh   
-
-  to fill these directories with input files. ( You can also use this 
-      script to update the input files in the job directories while a production 
-      run is running. ) 
+  to fill these directories with input files. (You can also use this 
+  script to update the input files in the job directories while a production 
+  run is running.) 
 
 
-  5. Run/manage  your jobs.          /Top_directory
+  5. Run/manage  your jobs.          `/Top\_directory`
 
   - From /Simulation use the script: 
-  ./start_my_jobs.sh         to start your simulations. 
+  ```sh
+  ./start_my_jobs.sh         
+  ```
+  to start your simulations. 
 
   This will descend into each directory in /MainJob_dir and launch  
-  'sbatch sbatch_start'     
+  ```sh
+  sbatch sbatch_start
+  ```
 
   This in turn will run the equilibration simulation before starting 
-  'sbatch sbatch_production' 
+  `sbatch\_sbatch\_production`.
   This will generate production data stored in each job directory. 
 
   If you need to stop your jobs you can do so with:
 
+  ```sh
   ./stop_all_jobs_gently.sh 
+  ```
 
   or 
 
@@ -211,6 +230,7 @@ Original author: Mike Kuiper (VLSCI)
   In each job directory there are a number of hidden files that are used to keep track
   of the system status. Users don't need to worry about them but they are: 
 
+  ```sh
   .countdown.txt       - file to countdown the runs of a particular simulation 
   .current_job_id.txt  - current job id number
   .jobdir_id           - current simulation directory
@@ -218,9 +238,7 @@ Original author: Mike Kuiper (VLSCI)
   .old_slurm_file      - old slurm file for housekeeping purposes
 
   pausejob             - flag to stop jobs in event of something wrong. 
-
-
-
+  ```
 
 ### Crash recovery: 
 
@@ -253,20 +271,19 @@ Original author: Mike Kuiper (VLSCI)
   Looking at the size of the files we notice that job:
   `2012-09-06-17.57.calmodulin\_run2\_.5.dcd`
 
-  has a file size of 3789024 where preceding files sizes are the same at
-  21931876 As we expect the files sizes to be almost identical in size, we can 
-  assume that something when wrong at that step. Therefore the last "good" file is 
-
+  has a file size of $$ 3789024 $$ where preceding files sizes are the same at
+  $$ 21931876 $$ As we expect the files sizes to be almost identical in size, we can 
+  assume that something when wrong at that step. Therefore the last "good" file is:
   `2012-09-06-17.52.calmodulin\_run2\_.6.dcd`
-  
+
   ...which we enter when prompted. (cut and paste works well here.) 
 
   Be careful to pick the last good file,  - data after that point will be removed
   and the last good restart files retrieved ready to restart the simulations from
   that point onwards. 
 
-  Note:  Actually most bad files are moved to /Errors with a suffix ".bad"
-  You can remove them there with a "rm *.bad" command.  Use with caution!
+  Note: Actually most bad files are moved to /Errors with a suffix `.bad`
+  You can remove them there with a `rm \*.bad` command. Use with caution!
 
   Once you have set your directories, you can then simply restart the jobs using: 
 
@@ -285,7 +302,7 @@ Original author: Mike Kuiper (VLSCI)
 
   6. Analyze your results.     /Analysis
 
-  - Once all your jobs are done, you can go into this directory and pool all the 
+  Once all your jobs are done, you can go into this directory and pool all the 
   simulation data from all the directories and run some basic analysis as well 
   as ligand and protein backbone clustering. 
   This can also help make the files more manageable by creating a subset of data 
@@ -294,5 +311,5 @@ Original author: Mike Kuiper (VLSCI)
 
   7.  Writeup, make movies.    /Project/
 
-  - the /Project directory is all about writing up the associated manuscript
+  The /Project directory is all about writing up the associated manuscript
   and making any illustrations or movies from the simulation files. 
