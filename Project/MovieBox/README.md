@@ -61,8 +61,6 @@ stepping through the trajectory. The original tcl script would render frames at
 each step, but this can be rather time consuming if you want to use fancy ambient 
 occlusion lighting effects. The new approach is to write and save the plot.dat files, to be rendered later on a cluster or desktop.  (Using the RenderBox subdirectory).  
 
-*New GUI in vmd*
-
 As of VMD version 1.9.1,  there is a new GUI to be found under: 
 Extensions -> Visualization -> ViewChangeRender
 
