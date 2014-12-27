@@ -52,7 +52,7 @@ This is so you can easily reproduce a particular state should something go wrong
 e.g.) Display -> Display Settings -> External Renderer Options -> shadows on -> Amb.Occl on (ambient occlusion)
 
 
-*The molecular choreography*
+**The molecular choreography**
 
 In this section we use a modified version of the vmd tcl script `view_change_render.tcl`
 
