@@ -124,7 +124,7 @@ Original author: Mike Kuiper (VLSCI)
 
   Before starting any new project it is always a good idea to make a plan with
   regards to the work and expected outcomes. For this we a simple text document
-  called `./Project\_plan` in the top directory. It is a good place for documenting
+  called `./Project_plan` in the top directory. It is a good place for documenting
   the your original intentions and noting your project design.  This can be
   especially important when looking back on an older project and remembering the
   original rationale! Do make sure to spend time planning your work.
@@ -133,17 +133,17 @@ Original author: Mike Kuiper (VLSCI)
   The basic workflow of this directory structure is described here.
 (There are more specific README files in each of the directories.)
 
-  1. Build input models.    `/BUILD\_DIR`
+  1. Build input models.    `/BUILD_DIR`
 
-  - The place to do this is under `/BUILD\_DIR/`
+  - The place to do this is under `/BUILD_DIR/`
   - most topology and parameter files can be found under /Parameters
   - Once complete, place the relevant inputfiles under /InputFiles
   and make sure you have the right parameter files under /Parameters
 
-  2. Prepare your input files.      `/Setup\_and\_Config`
+  2. Prepare your input files.      `/Setup_and_Config`
 
-  - Under `/Setup\_and\_config` you can decide how many simulations to set up
-  by editing the `master\_config\_file`
+  - Under `/Setup_and_config` you can decide how many simulations to set up
+  by editing the `master_config_file`
   You can also run:
 
   ```sh
@@ -156,11 +156,11 @@ Original author: Mike Kuiper (VLSCI)
   A number of sbatch templates and example namd config files are stored
   here for you to modify for your specific job.  ie)
 
-  `sbatch\_start`        -  for setting up the equilibration step
-  `sim\_opt.conf`        -  the configuration file for the optimization step
+  `sbatch_start`        -  for setting up the equilibration step
+  `sim_opt.conf`        -  the configuration file for the optimization step
 
-  `sbatch\_production`   -  for the production runs
-  `sim\_production.conf` -  the configuration file for the production runs
+  `sbatch_production`   -  for the production runs
+  `sim_production.conf` -  the configuration file for the production runs
 
 
   3. Benchmark your sims.   /Setup_and_Config/Benchmarking
@@ -178,13 +178,13 @@ Original author: Mike Kuiper (VLSCI)
 
   4. Create and prepare job directories.
 
-  -From `/Setup\_and\_Config` use:
+  -From `/Setup_and_Config` use:
 
   ```sh
-  ./create\_job\_directories.sh
+  ./create_job_directories.sh
   ```
 
-  to create your job directories in `/MainJob\_dir` use:
+  to create your job directories in `/MainJob_dir` use:
 
   ```sh
   ./populate_config_files.sh
@@ -195,7 +195,7 @@ Original author: Mike Kuiper (VLSCI)
       run is running.)
 
 
-  5. Run/manage  your jobs.          `/Top\_directory`
+  5. Run/manage  your jobs.          `/Top_directory`
 
   - From /Simulation use the script:
   ```sh
@@ -209,7 +209,7 @@ Original author: Mike Kuiper (VLSCI)
   ```
 
   This in turn will run the equilibration simulation before starting
-  `sbatch\_sbatch\_production`.
+  `sbatch_sbatch_production`.
   This will generate production data stored in each job directory.
 
   If you need to stop your jobs you can do so with:
@@ -279,12 +279,12 @@ Original author: Mike Kuiper (VLSCI)
   ```
 
   Looking at the size of the files we notice that job:
-  `2012-09-06-17.57.calmodulin\_run2\_.5.dcd`
+  `2012-09-06-17.57.calmodulin_run2_.5.dcd`
 
   has a file size of $$ 3789024 $$ where preceding files sizes are the same at
   $$ 21931876 $$ As we expect the files sizes to be almost identical in size, we can
   assume that something when wrong at that step. Therefore the last "good" file is:
-  `2012-09-06-17.52.calmodulin\_run2\_.6.dcd`
+  `2012-09-06-17.52.calmodulin_run2_.6.dcd`
 
 ...which we enter when prompted. (cut and paste works well here.)
 
@@ -293,7 +293,7 @@ Original author: Mike Kuiper (VLSCI)
   that point onwards.
 
   Note: Actually most bad files are moved to /Errors with a suffix `.bad`
-  You can remove them there with a `rm \*.bad` command. Use with caution!
+  You can remove them there with a `rm *.bad` command. Use with caution!
 
   Once you have set your directories, you can then simply restart the jobs using:
 
