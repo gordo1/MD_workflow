@@ -1,25 +1,61 @@
 #!/usr/bin/env tclsh
-#################################################################################
-#   
-#   File Name: 03-solvate_ionize.tcl
-#   Created: Thu 22 May 2014 15:25:22 EST
-#   Last Modified: Thu 22 May 2014 15:32:19 EST
-#   Created By: Shane Gordon
-#
-################################################################################
+# AUTHOR:   Shane Gordon
+# FILE:     03-solvate_ionize.tcl
+# ROLE:     TODO (some explanation)
+# CREATED:  2015-05-22 15:25:22
+# MODIFIED: 2015-01-06 23:20:23
 
-# Solvate
-set psf "change_me.1.psf"
-set pdb "change_me.1.pdb"
-set rbddh   "change_me.1_solvate"
+# Instructions --------------------------------------------------------------- {{{
+
+# Call this script using an external shell command:
+#   vmd -e 03-solvate_ionize.tcl -args "input_prefix"
+#   Replacing "input_prefix" with an appropriate value
+#   Be sure to feed in only one arg!
+
+# }}}
+
+# Basic checks --------------------------------------------------------------- {{{
+
+proc file_check { filename } {
+  if { [file exists $filename] == 0} {
+    puts "$filename not found. Is the input prefix wrong?"
+    exit
+  }
+}
+
+if { $argc == 1 } {
+  set input_prefix $argv
+  file_check $input_prefix.pdb
+  file_check $input_prefix.psf
+} elseif { $argc == 0 } {
+  puts "No arguments given!"
+  exit
+} elseif { $argc > 1 } {
+  puts "Too many arguments"
+  exit
+}
+}
+
+# }}}
+
+# Solvate -------------------------------------------------------------------- {{{
+
+set psf "${input_prefix}.psf"
+set pdb "${input_prefix}.pdb"
+set rbddh "${input_prefix}_solvate"
 source ./rhombicdodecahedron.tcl
 
-# Ionize
-set iprefix "change_me.1_solvate"
-set oprefix "change_me.1_ionized"
+# }}}
+
+# Ionize --------------------------------------------------------------------- {{{
+
+set iprefix "$rbddh"
+set oprefix "${iprefix}_ionized"
 set ionconc 0.15
 
 package require autoionize
 autoionize -psf $iprefix.psf -pdb $iprefix.pdb -sc $ionconc -o $oprefix
+
+# }}}
 
 exit
