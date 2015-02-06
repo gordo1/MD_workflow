@@ -3,7 +3,7 @@
 # FILE:     01-autopsf.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-05-22 14:21:19
-# MODIFIED: 2015-01-04 17:37:52
+# MODIFIED: 2015-02-06 13:21:22
 
 # Instructions --------------------------------------------------------------- {{{
 
@@ -13,7 +13,6 @@
 #   Be sure to feed in only one arg!
 
 # }}}
-
 # Load PDB molecule from the Protein Data Base ------------------------------- {{{
 
 set input "$argv"
@@ -22,7 +21,6 @@ set temp_prot "temp_${input}"
 mol load pdb ${input}.pdb
 
 #  }}}
-
 # Creates protein-only selection for segment building ------------------------ {{{
 
 #   Protein
@@ -30,7 +28,6 @@ set sel [atomselect top "protein and noh" frame 0]
 $sel writepdb $temp_prot.pdb
 
 #  }}}
-
 # PSFGEN part ---------------------------------------------------------------- {{{
 
 # Renames isoleucine delta-carbon atom from CD1 to CD, as specified in
