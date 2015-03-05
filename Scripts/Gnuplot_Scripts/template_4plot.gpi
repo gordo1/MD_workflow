@@ -3,7 +3,7 @@
 # FILE:     template.gpi
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-09-09 10:10:34
-# MODIFIED: 2014-09-09 16:19:51
+# MODIFIED: 2015-03-03 21:14:15
 
 #set terminal xterm font "Helvetica, 12" enhanced
 set style data lines
@@ -24,6 +24,9 @@ set ytics out scale 2 font "FONT, TICSIZE"
 # Border options
 set border linewidth BORDERWIDTH
 
+# Key
+set key opaque
+
 # Style defaults
 set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 5    #blue
 set style line 2 lc rgb '#dd181f' lt 1 lw 2 pt 7    #red
@@ -43,10 +46,14 @@ set ytics out scale 1 font "Arial, TICSIZE" nomirror # Removes xtics on top
 set xlabel XLABEL1 font ",AXISFONTSIZE"
 set ylabel YLABEL1 font ",AXISFONTSIZE"
 set yrange [0:100]
-plot FILE1p1 u 0:($1*100) w l ls 1 title TITLE1p1, \
-FILE1p2 u 0:($1*100) w l ls 2 title TITLE1p2, \
-FILE1p3 u 0:($1*100) w l ls 3 title TITLE1p3, \
-FILE1p4 u 0:($1*100) w l ls 4 title TITLE1p4
+plot SECONDARYSTRUCTURE u 0:($1*100+$2*100+$3*100+$4*100) w filledcurves x1 ls 4 title TITLE1p4, \
+SECONDARYSTRUCTURE u 0:($1*100+$2*100+$3*100) w filledcurves x1 ls 3 title TITLE1p3, \
+SECONDARYSTRUCTURE u 0:($1*100+$2*100) w filledcurves x1 ls 2 title TITLE1p2, \
+SECONDARYSTRUCTURE u 0:($1*100) w filledcurves x1 ls 1 title TITLE1p1, \
+SECONDARYSTRUCTURE u 0:($1*100+$2*100+$3*100+$4*100) w l ls 4 lc rgb "black" notitle, \
+SECONDARYSTRUCTURE u 0:($1*100+$2*100+$3*100) w l ls 3 lc rgb "black" notitle, \
+SECONDARYSTRUCTURE u 0:($1*100+$2*100) w l ls 2 lc rgb "black" notitle, \
+SECONDARYSTRUCTURE u 0:($1*100) w l ls 1 lc rgb "black" notitle
 
 # Plot 2
 set size 0.5,0.33

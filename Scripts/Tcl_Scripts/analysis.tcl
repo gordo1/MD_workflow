@@ -3,17 +3,17 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2014-10-06 11:21:19
+# MODIFIED: 2015-01-13 17:00:07
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
   if { [ file isdirectory $outdir ] == 1 } {
     puts "Output directory \"$outdir\" exists."
-    } else {
-      exec mkdir $outdir
-    }
-    package require saltbr
-    saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
+  } else {
+    exec mkdir $outdir
+  }
+  package require saltbr
+  saltbr -sel "$sel" -outdir $outdir -writefiles yes -frames $start:$end
 }
 
 proc sasa_scan { seltext outfile incr } {
@@ -23,8 +23,8 @@ proc sasa_scan { seltext outfile incr } {
   for { set frame 0 } { $frame < $nf } { incr frame $incr } {
     $sel frame $frame
     puts $sink "$frame [ measure sasa 1.4 $sel ]"
-    }
-    close $sink
+  }
+  close $sink
 }
 
 # Go through each frame of the trajectory
@@ -59,9 +59,9 @@ proc trajscan {a b {r 2.0}} {
         for {set k 0} {$k < [llength $protein_resid]} {incr k} {
           set sub_select [atomselect top "$protein_text and resid [lindex $protein_resid $k]"]
           append output_string " [lindex $protein_resid $k] [lsort -unique [$sub_select get resname]]"
-    }
-    puts $output_string
-    }
+  }
+  puts $output_string
+  }
 }
 }
 molinfo top set frame $oldframe
@@ -105,7 +105,7 @@ proc trajscanstatm {alist b {r 2.0}} {
       set contact [measure contacts $r $a $b]
       if {[llength [lindex $contact 0]] > 0} {
         incr count
-    }
+  }
 }
 if {$count == $nselect} {
   incr hits
@@ -208,7 +208,7 @@ for {set i 0} {$i < $nframe} {incr i} {
 }
 if {$writeFile==1} {
   close $fh
-} 
+}
 molinfo top set frame $oldframe
 }
 
@@ -235,7 +235,7 @@ for {set i 0} {$i < $nframe} {incr i} {
 }
 if {$writeFile==1} {
   close $fh
-} 
+}
 molinfo top set frame $oldframe
 }
 
@@ -279,7 +279,7 @@ for {set i 0} {$i < $nframe} {incr i} {
 if {$writeFile==1} {
   close $fh
 }
-molinfo top set frame $oldframe	
+molinfo top set frame $oldframe
 }
 
 # Write the indexes for the selection, sel, to a file fname.text and
@@ -298,9 +298,9 @@ proc get_charge {sel} {
 
 ## This takes a selection and fits that selection for every frame in the
 ## molecule (all atoms are moved, but the fit is based on the selection).
-## 
+##
 ## For example:  fitframes top "protein"
-## 
+##
 ## -Jim
 proc fitframes { molid seltext } {
   set ref [atomselect $molid $seltext frame 0]
@@ -370,8 +370,8 @@ proc rmsdscan { sel mol } {
     $compare frame $frame
     set rmsd [ measure rmsd $compare $reference ]
     puts $f "$frame $rmsd"
-    } 
-    close $f
+  }
+  close $f
 }
 
 
@@ -440,56 +440,56 @@ proc twitch_reps {molid} {
 proc outputcheck { filename } {
   if { [ file exists "$filename" ] } {
     puts " File \"$filename\" has been created successfully"
-    } else {
-      puts " File \"$filename\" was NOT found."
-      puts " Something has gone wrong here..."
-      puts " Exiting prematurely"
-      exit
-    }
+  } else {
+    puts " File \"$filename\" was NOT found."
+    puts " Something has gone wrong here..."
+    puts " Exiting prematurely"
+    exit
+  }
 }
 
-proc ss_calc { molid start end stride } {
+# Secondary structure scan across a trajectory
+proc ss_calc { molid start end stride } { ;# ../Scripts/Tcl_Scripts/analysis.tcl
   # Deletes old directory, if found
   puts "Looking for old directory. If found, will delete it"
   if { [ file exists "./SecondaryStructure" ] } {
-    file delete -force "./SecondaryStructure" 
+    file delete -force "./SecondaryStructure"
     file mkdir "./SecondaryStructure"
-} else {
-  file  mkdir "./SecondaryStructure"
-}
-# # Calculation bit
-puts "Getting secondary structure information." 
-set fd [open "sec_structure.dat" w ] 
-set protCA [atomselect 0 "protein name CA"] 
-set numRes [llength [$protCA get resid]]
-puts "$start $end"
-for { set i $start } { $i < $end } { incr i $stride } { 
-  puts "Processing Frame No $i of $end. Remaining frames: [expr $end - $i]" ;# Lets us know what point in the trajectory we're up to
-  $protCA frame $i 
-  $protCA update 
-  animate goto $i
-  mol ssrecalc $molid 
-  set sscache_data($i) [$protCA get structure] 
-  set helix [llength [lsearch -all $sscache_data($i) H ]] 
-  set turn [llength [lsearch -all $sscache_data($i) T ]] 
-  set coil [llength [lsearch -all $sscache_data($i) C ]] 
-  set beta [llength [lsearch -all $sscache_data($i) B ]] 
-  set helixPercent [expr { [llength [lsearch -all $sscache_data($i) H ]] / double($numRes)}] 
-  set turnPercent [expr { [llength [lsearch -all $sscache_data($i) T ]] / double($numRes)}] 
-  set coilPercent [expr { [llength [lsearch -all $sscache_data($i) C ]] / double($numRes)}] 
-  set betaPercent [expr { [llength [lsearch -all $sscache_data($i) B ]] / double($numRes)}] 
-  lappend ThelixPercent $helixPercent 
-  lappend TturnPercent $turnPercent 
-  lappend TcoilPercent $coilPercent 
-  lappend TbetaPercent $betaPercent 
-  puts $fd $sscache_data($i) 
-  puts "Structure: $i" 
-    } 
-    close $fd 
-    $protCA delete 
-    write_vector $ThelixPercent ./SecondaryStructure/helixPercent.plt 
-    write_vector $TturnPercent ./SecondaryStructure/turnPercent.plt 
-    write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt 
-    write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt 
+  } else {
+    file  mkdir "./SecondaryStructure"
+  }
+  puts "Getting secondary structure information."
+  set fd [open "sec_structure.dat" w ]
+  set protCA [atomselect 0 "protein name CA"]
+  set numRes [llength [$protCA get resid]]
+  puts "$start $end"
+  for { set i $start } { $i < $end } { incr i $stride } {
+    puts "Processing Frame No $i of $end. Remaining frames: [expr $end - $i]" ;# Lets us know what point in the trajectory we're up to
+    $protCA frame $i
+    $protCA update
+    animate goto $i
+    mol ssrecalc $molid
+    set sscache_data($i) [$protCA get structure]
+    set helix [llength [lsearch -all $sscache_data($i) H ]]
+    set turn [llength [lsearch -all $sscache_data($i) T ]]
+    set coil [llength [lsearch -all $sscache_data($i) C ]]
+    set beta [llength [lsearch -all $sscache_data($i) B ]]
+    set helixPercent [expr { [llength [lsearch -all $sscache_data($i) H ]] / double($numRes)}]
+    set turnPercent [expr { [llength [lsearch -all $sscache_data($i) T ]] / double($numRes)}]
+    set coilPercent [expr { [llength [lsearch -all $sscache_data($i) C ]] / double($numRes)}]
+    set betaPercent [expr { [llength [lsearch -all $sscache_data($i) B ]] / double($numRes)}]
+    lappend ThelixPercent $helixPercent
+    lappend TturnPercent $turnPercent
+    lappend TcoilPercent $coilPercent
+    lappend TbetaPercent $betaPercent
+    puts $fd $sscache_data($i)
+    puts "Structure: $i"
+  }
+  close $fd
+  $protCA delete
+  write_vector $ThelixPercent ./SecondaryStructure/helixPercent.plt
+  write_vector $TturnPercent ./SecondaryStructure/turnPercent.plt
+  write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt
+  write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt
 }
 
