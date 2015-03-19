@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.sh
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:02:52
-# MODIFIED: 2015-03-03 21:13:18
+# MODIFIED: 2015-03-19 16:08:26
 
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a5_other_analyses.tcl
 
@@ -16,8 +16,8 @@ fi
 # Some useful plots
 
 GNUPLOTTEMPLATE="../Scripts/Gnuplot_Scripts/template_4plot.gpi"
-gnuplot -e "OUTPUT='./analysis.pdf'" \
-        -e "SECONDARYSTRUCTURE='./SecondaryStructure/SecondaryStructure.dat'" \
+gnuplot -e "OUTPUT='${PWD}/analysis.pdf'" \
+        -e "SECONDARYSTRUCTURE='${PWD}/SecondaryStructure/SecondaryStructure.dat'" \
         -e "YLABEL1='Percent Structure'" \
         -e "XLABEL1='Frame (10 ps frame^{-1})'" \
         -e "TITLE1p1='Beta'" \
@@ -34,6 +34,6 @@ gnuplot -e "OUTPUT='./analysis.pdf'" \
         -e "TITLE3='RMSD'" \
         -e "FILE4='./rmsf_protein_backbone.txt'" \
         -e "YLABEL4='RMSF (Angstrom)'" \
-        -e "XLABEL4='Frame (10 ps frame^{-1})'" \
+        -e "XLABEL4='Residue No'" \
         -e "TITLE4='RMSF'" \
         $GNUPLOTTEMPLATE
