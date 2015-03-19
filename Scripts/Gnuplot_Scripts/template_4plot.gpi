@@ -3,7 +3,7 @@
 # FILE:     template.gpi
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-09-09 10:10:34
-# MODIFIED: 2015-03-03 21:14:15
+# MODIFIED: 2015-03-19 16:04:54
 
 #set terminal xterm font "Helvetica, 12" enhanced
 set style data lines
@@ -11,18 +11,17 @@ set style data lines
 # Enable macros
 set macros
 
-# Formatting styles
-AXISFONTSIZE = '18'
-TICSIZE = '16'
-FONT = 'Arial'
-BORDERWIDTH = '5'
-
 # Set font style for figure title, axis labels"
 set xtics out scale 2 font "FONT, TICSIZE"
 set ytics out scale 2 font "FONT, TICSIZE"
 
 # Border options
+BORDERWIDTH = '5'
 set border linewidth BORDERWIDTH
+
+# Font options
+axis_font = "Arial,12"
+label_font = "Arial,12"
 
 # Key
 set key opaque
@@ -41,10 +40,10 @@ set output OUTPUT
 set multiplot
 set size 1,0.33
 set origin 0,0.66
-set xtics out scale 1 font "Arial, TICSIZE" nomirror # Removes ytics on RHS
-set ytics out scale 1 font "Arial, TICSIZE" nomirror # Removes xtics on top
-set xlabel XLABEL1 font ",AXISFONTSIZE"
-set ylabel YLABEL1 font ",AXISFONTSIZE"
+set xtics out scale 1 font axis_font nomirror # Removes ytics on RHS
+set ytics out scale 1 font axis_font nomirror # Removes xtics on top
+set xlabel XLABEL1 font label_font
+set ylabel YLABEL1 font label_font
 set yrange [0:100]
 plot SECONDARYSTRUCTURE u 0:($1*100+$2*100+$3*100+$4*100) w filledcurves x1 ls 4 title TITLE1p4, \
 SECONDARYSTRUCTURE u 0:($1*100+$2*100+$3*100) w filledcurves x1 ls 3 title TITLE1p3, \
@@ -58,30 +57,30 @@ SECONDARYSTRUCTURE u 0:($1*100) w l ls 1 lc rgb "black" notitle
 # Plot 2
 set size 0.5,0.33
 set origin 0,0.33
-set xtics out scale 1 font "Arial, TICSIZE" nomirror # Removes ytics on RHS
-set ytics out scale 1 font "Arial, TICSIZE" nomirror # Removes xtics on top
-set xlabel XLABEL2 font ",AXISFONTSIZE"
-set ylabel YLABEL2 font ",AXISFONTSIZE"
+set xtics out scale 1 font axis_font nomirror # Removes ytics on RHS
+set ytics out scale 1 font axis_font nomirror # Removes xtics on top
+set xlabel XLABEL2 font label_font
+set ylabel YLABEL2 font label_font
 set yrange [0:*]
 plot FILE2 w l ls 1 title TITLE2, \
 
 # Plot 3
 set size 0.5,0.33
 set origin 0.5,0.33
-set xtics out scale 1 font "Arial, TICSIZE" nomirror # Removes ytics on RHS
-set ytics out scale 1 font "Arial, TICSIZE" nomirror # Removes xtics on top
-set xlabel XLABEL3 font ",AXISFONTSIZE"
-set ylabel YLABEL3 font ",AXISFONTSIZE"
+set xtics out scale 1 font axis_font nomirror # Removes ytics on RHS
+set ytics out scale 1 font axis_font nomirror # Removes xtics on top
+set xlabel XLABEL3 font label_font
+set ylabel YLABEL3 font label_font
 set yrange [0:*]
 plot FILE3 u 1:2 w l ls 1 title TITLE3, \
 
 # Plot 4
 set size 1,0.33
 set origin 0,0
-set xtics out scale 1 font "Arial, TICSIZE" nomirror # Removes ytics on RHS
-set ytics out scale 1 font "Arial, TICSIZE" nomirror # Removes xtics on top
-set xlabel XLABEL4 font ",AXISFONTSIZE"
-set ylabel YLABEL4 font ",AXISFONTSIZE"
+set xtics out scale 1 font axis_font nomirror # Removes ytics on RHS
+set ytics out scale 1 font axis_font nomirror # Removes xtics on top
+set xlabel XLABEL4 font label_font
+set ylabel YLABEL4 font label_font
 set yrange [0:*]
 plot FILE4 u 1:2 w l ls 1 title TITLE4, \
 
