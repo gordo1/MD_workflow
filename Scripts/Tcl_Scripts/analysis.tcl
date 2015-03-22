@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-01-13 17:00:07
+# MODIFIED: 2015-03-22 17:30:09
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
@@ -377,11 +377,13 @@ proc rmsdscan { sel mol } {
 
 # per residue rmsf to file
 proc rmsfscan { sel fname } {
+  set rlist [$sel get resid]
   set rmsf [measure rmsf $sel]
-  set n [llength $rmsf]
+  set s [lindex $rlist 0]
+  set n [lindex $rlist end]
   set f [open $fname.txt "w"]
-  for {set i 1} {$i < $n} {incr i} {
-    puts $f "$i [lindex $rmsf $i]"
+  for {set i $s} {$i <= $n} {incr i} {
+    puts $f "$i [lindex $rmsf [expr $i - $s]]"
 }
 close $f
 }
