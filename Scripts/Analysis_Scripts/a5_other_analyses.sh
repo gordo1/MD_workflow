@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.sh
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:02:52
-# MODIFIED: 2015-03-19 17:09:14
+# MODIFIED: 2015-03-23 15:50:23
 
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a5_other_analyses.tcl
 
@@ -35,5 +35,9 @@ gnuplot -e "OUTPUT='${PWD}/analysis.pdf'" \
         -e "FILE4='./rmsf_protein_backbone.txt'" \
         -e "YLABEL4='RMSF (Angstrom)'" \
         -e "XLABEL4='Residue No'" \
-        -e "TITLE4='RMSF'" \
+        -e "TITLE4='RMSF Total'" \
+        -e "FILE5='./protein_sasa.txt'" \
+        -e "YLABEL5='SASA (units)'" \
+        -e "XLABEL5='Simulation Frame'" \
+        -e "TITLE5='SASA'" \
         $GNUPLOTTEMPLATE

@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-03-22 17:30:09
+# MODIFIED: 2015-03-23 16:12:46
 
 # DESCRIPTION
 proc saltbrscan { start end sel outdir } {
@@ -384,7 +384,20 @@ proc rmsfscan { sel fname } {
   set f [open $fname.txt "w"]
   for {set i $s} {$i <= $n} {incr i} {
     puts $f "$i [lindex $rmsf [expr $i - $s]]"
+  }
+close $f
 }
+
+# per residue rmsf to file
+proc rmsfscan_range { sel start_frame end_frame fname } {
+  set rlist [$sel get resid]
+  set rmsf [measure rmsf $sel first $start_frame last $end_frame ]
+  set s [lindex $rlist 0]
+  set n [lindex $rlist end]
+  set f [open $fname.txt "w"]
+  for {set i $s} {$i <= $n} {incr i} {
+    puts $f "$i [lindex $rmsf [expr $i - $s]]"
+  }
 close $f
 }
 
