@@ -3,10 +3,11 @@
 # FILE:     template.gpi
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-09-09 10:10:34
-# MODIFIED: 2015-03-23 16:02:52
+# MODIFIED: 2015-04-04 09:36:16
 
 #set terminal xterm font "Helvetica, 12" enhanced
 set style data lines
+set encoding iso_8859_1
 
 # Enable macros
 set macros
@@ -45,14 +46,14 @@ set ytics out scale 1 font axis_font nomirror # Removes xtics on top
 set xlabel XLABEL1 font label_font
 set ylabel YLABEL1 font label_font
 set yrange [0:100]
-plot SECONDARYSTRUCTURE u ($0*1000):($1*100+$2*100+$3*100+$4*100) w filledcurves x1 ls 4 title TITLE1p4, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100+$2*100+$3*100) w filledcurves x1 ls 3 title TITLE1p3, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100+$2*100) w filledcurves x1 ls 2 title TITLE1p2, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100) w filledcurves x1 ls 1 title TITLE1p1, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100+$2*100+$3*100+$4*100) w l ls 4 lc rgb "black" notitle, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100+$2*100+$3*100) w l ls 3 lc rgb "black" notitle, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100+$2*100) w l ls 2 lc rgb "black" notitle, \
-SECONDARYSTRUCTURE u ($0*1000):($1*100) w l ls 1 lc rgb "black" notitle
+plot SECONDARYSTRUCTURE u ($0):($1*100+$2*100+$3*100+$4*100) w filledcurves x1 ls 4 title TITLE1p4, \
+SECONDARYSTRUCTURE u ($0):($1*100+$2*100+$3*100) w filledcurves x1 ls 3 title TITLE1p3, \
+SECONDARYSTRUCTURE u ($0):($1*100+$2*100) w filledcurves x1 ls 2 title TITLE1p2, \
+SECONDARYSTRUCTURE u ($0):($1*100) w filledcurves x1 ls 1 title TITLE1p1, \
+SECONDARYSTRUCTURE u ($0):($1*100+$2*100+$3*100+$4*100) w l ls 4 lc rgb "black" notitle, \
+SECONDARYSTRUCTURE u ($0):($1*100+$2*100+$3*100) w l ls 3 lc rgb "black" notitle, \
+SECONDARYSTRUCTURE u ($0):($1*100+$2*100) w l ls 2 lc rgb "black" notitle, \
+SECONDARYSTRUCTURE u ($0):($1*100) w l ls 1 lc rgb "black" notitle
 
 # Plot 5
 set size 0.5,0.33
@@ -92,6 +93,6 @@ set ytics out scale 1 font axis_font nomirror # Removes xtics on top
 set xlabel XLABEL4 font label_font
 set ylabel YLABEL4 font label_font
 set yrange [0:*]
-plot FILE4 u 1:2 w l ls 1 title TITLE4, for [i=1:5] 'rmsf_protein_backbone_'.i.'of5.txt' w l title ''.i.'th Fraction of 5'\
+plot for [i=1:5] 'rmsf_protein_backbone_'.i.'of5.txt' w l title ''.i.'th Fraction of 5'\
 
 reset
