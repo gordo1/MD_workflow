@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:04:49
-# MODIFIED: 2015-04-04 09:19:36
+# MODIFIED: 2015-04-04 09:48:59
 
 #------------------------------------------------------------------------------
 
@@ -52,10 +52,12 @@ source ../Scripts/Tcl_Scripts/bigdcd.tcl
 # RMSD scan
 filecheck rmsd_protein.txt
 bigdcd rmsdscan_bigdcd $input.dcd
+bigdcd_wait
 
 # Radius of gyration scan
 filecheck protein_radius_gyration.txt
 bigdcd rgyrscan_bigdcd $input.dcd
+bigdcd_wait
 
 # RMSF scan
 if { [file exists ./number_frames.txt ] } {
@@ -85,10 +87,12 @@ filecheck SecondaryStructure/coilPercent.plt
 filecheck SecondaryStructure/helixPercent.plt
 filecheck SecondaryStructure/turnPercent.plt
 bigdcd ss_calc_bigdcd $input.dcd
+bigdcd_wait
 
 # Time-dependent SASA-scan for entire simulation
 filecheck protein_sasa.txt
 bigdcd sasa_scan_bigdcd $input.dcd
+bigdcd_wait
 
 #------------------------------------------------------------------------------
 
