@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-04-03 18:41:17
+# MODIFIED: 2015-04-04 10:01:33
 
 # saltbrscan ----------------------------------------------------------------- {{{
 
@@ -555,7 +555,7 @@ proc ss_calc_bigdcd { frame } {
   lappend TcoilPercent $coilPercent
   lappend TbetaPercent $betaPercent
   puts $fd $sscache_data($frame)
-  puts "STRUCTURE\n\tH: $ThelixPercent\n\tT: $TturnPercent\n\tC: $TcoilPercent\n\tB: $TbetaPercent"
+  # puts "STRUCTURE\n\tH: $ThelixPercent\n\tT: $TturnPercent\n\tC: $TcoilPercent\n\tB: $TbetaPercent"
   close $fd
   if { [ file isdirectory "./SecondaryStructure" ] != 1 } {
     file mkdir "./SecondaryStructure"
