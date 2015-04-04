@@ -3,7 +3,18 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-04-04 10:01:33
+# MODIFIED: 2015-04-04 14:03:34
+#
+
+# write_vector --------------------------------------------------------------- {{{
+
+proc write_vector { vec filename } {
+  set fid [open $filename a]
+  foreach elem $vec { puts $fid $elem }
+  close $fid
+}
+
+# }}}
 
 # saltbrscan ----------------------------------------------------------------- {{{
 
@@ -100,8 +111,8 @@ proc trajscanstat {a b {r 2.0}} {
     set contact [measure contacts $r $a $b]
     if {[llength [lindex $contact 0]] > 0} {
       incr count
-}
-}
+    }
+  }
 molinfo top set frame $oldframe
 puts "============================================="
 puts "$count hits"
@@ -345,6 +356,8 @@ proc get_charge {sel} {
   eval "vecadd [$sel get charge]"
 }
 
+# fitframes ------------------------------------------------------------------ {{{
+
 ## This takes a selection and fits that selection for every frame in the
 ## molecule (all atoms are moved, but the fit is based on the selection).
 ##
@@ -361,12 +374,16 @@ proc fitframes { molid seltext } {
     $sel frame $i
     $all frame $i
     $all move [measure fit $sel $ref]
+  }
+  $ref delete
+  $sel delete
+  $all delete
+  return
 }
-$ref delete
-$sel delete
-$all delete
-return
-}
+
+# }}}
+
+# fitagainst ----------------------------------------------------------------- {{{
 
 proc fitagainst { molid0 molid1 seltext } {
   set ref [atomselect $molid0 $seltext frame 0]
@@ -381,6 +398,8 @@ proc fitagainst { molid0 molid1 seltext } {
 }
 return
 }
+
+# }}}
 
 # for the given molid mark the beta column for the selection text to 1
 proc mark_beta { molid seltext } {
@@ -443,6 +462,7 @@ proc rmsdscan_bigdcd { frame } {
 
 # }}}
 
+# rmsfscan ------------------------------------------------------------------- {{{
 
 # per residue rmsf to file
 proc rmsfscan { sel fname } {
@@ -453,9 +473,13 @@ proc rmsfscan { sel fname } {
   set f [open $fname.txt "w"]
   for {set i $s} {$i <= $n} {incr i} {
     puts $f "$i [lindex $rmsf [expr $i - $s]]"
+  }
+  close $f
 }
-close $f
-}
+
+# }}}
+
+# rmsfscan_range ------------------------------------------------------------- {{{
 
 # per residue rmsf to file
 proc rmsfscan_range { sel start_frame end_frame fname } {
@@ -466,9 +490,11 @@ proc rmsfscan_range { sel start_frame end_frame fname } {
   set f [open $fname.txt "w"]
   for {set i $s} {$i <= $n} {incr i} {
     puts $f "$i [lindex $rmsf [expr $i - $s]]"
+  }
+  close $f
 }
-close $f
-}
+
+# }}}
 
 proc switch_on_tube_scaling { {field beta}} {
   set env(VMDMODULATERIBBON) $field
@@ -485,8 +511,8 @@ proc split_chain_fragments { mol } {
     set chain [lsort -unique [$sel get chain]]
     $sel writepdb chain$chain\_fragment$frag.pdb
     $sel delete
-}
-$all delete
+  }
+  $all delete
 }
 
 # reads a two column: <resid> <data>
@@ -504,8 +530,8 @@ proc apply_beta_from_file {fname molid} {
       set sel [atomselect $molid "protein and resid $resid"]
       $sel set beta $rmsf
       $sel delete
-}
-}
+    }
+  }
 }
 
 # work on the assumption that there is only one representation for
@@ -531,6 +557,8 @@ proc outputcheck { filename } {
   exit
 }
 }
+
+# ss_calc_bigdcd ------------------------------------------------------------- {{{
 
 # Secondary structure scan across a trajectory
 # Loads trajectory frame-by-frame using bigdcd
@@ -565,6 +593,10 @@ proc ss_calc_bigdcd { frame } {
   write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt
   write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt
 }
+
+# }}}
+
+# ss_calc -------------------------------------------------------------------- {{{
 
 # Secondary structure scan across a trajectory
 proc ss_calc { molid start end stride } { ;# ../Scripts/Tcl_Scripts/analysis.tcl
@@ -611,3 +643,4 @@ write_vector $TcoilPercent ./SecondaryStructure/coilPercent.plt
 write_vector $TbetaPercent ./SecondaryStructure/betaPercent.plt
 }
 
+# }}}
