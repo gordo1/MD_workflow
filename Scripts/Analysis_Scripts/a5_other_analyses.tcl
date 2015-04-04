@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:04:49
-# MODIFIED: 2015-04-04 09:48:59
+# MODIFIED: 2015-04-04 14:16:39
 
 #------------------------------------------------------------------------------
 
@@ -67,6 +67,7 @@ if { [file exists ./number_frames.txt ] } {
   set num_frames $r
 } else {
   puts "Can't find ./number_frames.txt.\nCan't manage RMSF calculations without this info"
+  exit
 }
 set rmsf_fraction_count 1
 set frame_incr [ expr $num_frames / $num_rmsf_windows ]
@@ -75,7 +76,7 @@ while { $rmsf_fraction_count <= $num_rmsf_windows } {
   set first_frame [ expr ( $rmsf_fraction_count - 1 ) * $frame_incr ]
   set last_frame [ expr ( $first_frame + $frame_incr ) -1 ]
   mol addfile $input.dcd first $first_frame last $last_frame waitfor all
-  rmsfscan_range $sel_CA 0 -1 "rmsf_protein_backbone_${rmsf_fraction_count}of${num_rmsf_windows}"
+  rmsfscan_range $sel_CA 1 -1 "rmsf_protein_backbone_${rmsf_fraction_count}of${num_rmsf_windows}"
   animate delete all
   incr rmsf_fraction_count
 }
