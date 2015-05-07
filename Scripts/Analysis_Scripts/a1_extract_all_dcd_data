@@ -11,15 +11,13 @@ source ../Scripts/common_functions.sh
 combined="combined_dcd_loader_script"
 
 #-- make a temporary data directory: 
-if [ -d temp_data_dir ];
-then
- rm -rf temp_data_dir
+if [ -d temp_data_dir ]; then
+  rm -rf temp_data_dir
 fi
-mkdir temp_data_dir
+mkdir -p temp_data_dir
 
-if [ -f dcdfile_list.txt ];
-then
-        rm dcdfile_list.txt
+if [ -f dcdfile_list.txt ]; then
+  rm dcdfile_list.txt
 fi
 
 #-- write header to file: 
@@ -35,7 +33,7 @@ read_master_config_file ../Setup_and_Config
 echo "#!/usr/local/bin/vmd " >basic_vmd_setup.vmd
 echo "# VMD script written by save_state $Revision: 1.44 $" >>basic_vmd_setup.vmd
 echo "# VMD version: 1.9.1" >>basic_vmd_setup.vmd
- 
+
 # -- grab input psf and pdb files to create a basic vmd setup file. 
 # -- assuming psf and pdb file reside in /InputFiles  (ignore change_me dummy files)
 # -- prone to error -must check resultant setup file. 
@@ -54,30 +52,31 @@ printf "mol addfile ../InputFiles/%s type pdb first 0 last -1 step 1 filebonds 1
 cd ../
 
 # --Check for existing directories under /MainJob_dir and grab "official" directory list. 
- 
-if [ "$(ls -A $JOB_DIR)" ]; then
 
-# source directory list. 
-y=$(cat .dir_list.txt) 
+if [[ -d $JOB_DIR ]]; then
 
-cd $JOB_DIR
+  # source directory list. 
+  y=$(cat .dir_list.txt) 
 
-for i in $y
-do
-# --Extract dcd file locations into /CollectiveData/dcd_job_loader_file.vmd
- cd $i
+  cd $JOB_DIR
 
-# grab directory name
- echo -e " Extracting dcd file details in directory $JOB_DIR/$i \n "
- ../../Scripts/Analysis_Scripts/create_dcd_loader_script 
+  for i in $y
+  do
+    # --Extract dcd file locations into /CollectiveData/dcd_job_loader_file.vmd
+    cd $i
+    index=`echo $i | sed 's/.*_//'`
 
-# merge files: 
- cat OutputFiles/local_dcd_file_loader.vmd  >> ../../Analysis/$combined.vmd
- cat OutputFiles/dcdfile_list.txt  >> ../../Analysis/dcdfile_list.txt
- rm OutputFiles/dcdfile_list.txt
- cd ../
- 
-done
+    # grab directory name
+    echo -e " Extracting dcd file details in directory $JOB_DIR/$i \n "
+    ../../Scripts/Analysis_Scripts/create_dcd_loader_script 
+
+    # merge files: 
+    cat OutputFiles/local_dcd_file_loader.vmd  >> ../../Analysis/${combined}_${index}.vmd
+    cat OutputFiles/dcdfile_list.txt  >> ../../Analysis/dcdfile_list_${index}.txt
+    rm OutputFiles/dcdfile_list.txt
+    cd ../
+
+  done
 fi
 
 echo -e " Extracted locations of dcd files from the /MainJob_dir in $combined.vmd" 
@@ -85,5 +84,3 @@ echo -e " Setup files written to basic_vmd_setup.vmd "
 echo -e " Make sure to check basic_vmd_setup.vmd is pointing to the right files! " 
 
 cd ../Analysis
-
-

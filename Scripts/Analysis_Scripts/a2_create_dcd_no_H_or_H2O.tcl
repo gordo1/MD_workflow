@@ -14,19 +14,19 @@ set out [open "summary.txt" a]
 
 # read in raw data: 
 puts " reading in entire data set:"
-source basic_vmd_setup.vmd
+# source basic_vmd_setup.vmd
 
 # load useful analysis script:  
 source ../Scripts/Tcl_Scripts/analysis.tcl
 
 # source combined_dcd_loader_script.vmd 
 mol new [ glob ../InputFiles/*psf ]
-mol addfile [ glob ../InputFiles/*pdb ]
+mol addfile [ glob ../InputFiles/*pdb ] waitfor all
 
 set reduced_sel "protein"
 set sel_all [ atomselect top "$reduced_sel" ]
-reduced $sel no_water_no_hydrogen
-set num_sel [$sel num]
+reduced $sel_all no_water_no_hydrogen
+set num_sel [$sel_all num]
 set cha_all [get_charge $sel_all ]
 puts $out " Total reduced atoms:  $num_sel \n  "
 puts $out " Total charge:         $cha_all  "
@@ -42,65 +42,41 @@ puts " reading in reduced data..."
 mol delete top
 
 # generates a list of dcd files that will be reduced
-set fp [ open "./dcdfile_list.txt" r ]
-set file_data [ read $fp ]
-set data [ split $file_data "\n" ]
 
-# file-by-file removal of atoms to a reduced selection
-# these temp files are subsequently concatenated using catdcd
-mol new [ glob ../InputFiles/*psf ]
-set i 1
-foreach dcd $data {
-        set sel_all [ atomselect top $reduced_sel ]
-        animate read dcd ${dcd} beg 0 end -1 waitfor all top
-        if { $i < 10 } {        
-                animate write dcd temp_000$i.dcd beg 0 end -1 sel $sel_all waitfor all top
-                animate delete all
-                incr i
-        } elseif { $i < 100 } {
-                animate write dcd temp_00$i.dcd beg 0 end -1 sel $sel_all waitfor all top
-                animate delete all
-                incr i
-        } elseif { $i < 1000 } {
-                animate write dcd temp_0$i.dcd beg 0 end -1 sel $sel_all waitfor all top
-                animate delete all
-                incr i
-        } elseif { $i < 10000 } {
-                animate write dcd temp_$i.dcd beg 0 end -1 sel $sel_all waitfor all top
-                animate delete all
-                incr i
-        }
-}
+foreach index [ lsort [glob dcdfile_list_*] ] {
+  regexp {0.[0-9]{1,3}} $index index_no
+  set fp [ open "$index" r ]
+  set file_data [ read $fp ]
+  set data [ split $file_data "\n" ]
 
-#------------------------------------------------------------------------------
-
-set reduced_sel "protein"
-set sel_all [ atomselect top "$reduced_sel" ]
-mol delete all
+  # file-by-file removal of atoms to a reduced selection
+  # these temp files are subsequently concatenated using catdcd
+  mol new [ glob ../InputFiles/*psf ]
+  set i 1
+  foreach dcd $data {
+    set sel_all [ atomselect top $reduced_sel ]
+    animate read dcd ${dcd} beg 0 end -1 waitfor all top
+    if { $i < 10 } {        
+      animate write dcd ${index_no}_temp_000$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+      animate delete all
+      incr i
+      } elseif { $i < 100 } {
+        animate write dcd ${index_no}_temp_00$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+        animate delete all
+        incr i
+      } elseif { $i < 1000 } {
+        animate write dcd ${index_no}_temp_0$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+        animate delete all
+        incr i
+      } elseif { $i < 10000 } {
+        animate write dcd ${index_no}_temp_$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+        animate delete all
+        incr i
+      }
+    }
+  }
 
 #------------------------------------------------------------------------------
-
-# write out reduced data: 
-outputcheck no_water_no_hydrogen.dcd
-
-# taking reduced data set and aligning protein atoms
-mol new no_water_no_hydrogen.psf
-mol addfile no_water_no_hydrogen.dcd waitfor all
-
-source ../Scripts/Analysis_Scripts/clustering_configuration.tcl
-set sel [atomselect top "$reduced_sel"]
-
-puts " creating reduced selection of data: no water no hydrogen"
-
-#------------------------------------------------------------------------------
-puts " aligning protein backbone in reduced data"
-
-# fit reduced data to first frame and protein backbone: 
-fitframes top "$reduced_sel"
-
-# write out aligned reduced data: 
-animate write dcd no_water_no_hydrogen.dcd beg 0 end -1 sel $sel waitfor all
-outputcheck no_water_no_hydrogen.dcd
 
 mol delete all
 

@@ -11,12 +11,17 @@
 # Launch script: 
 
 source ../Scripts/common_functions.sh
-reduced="no_water_no_hydrogen"
+reduced="no_water"
 echo "Reading in data set..."
 echo "Writing reduced selection..."
 vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.tcl
 echo " Merging reduced data..."
-../Scripts/Tools/catdcd -otype dcd -o no_water_no_hydrogen.dcd temp_*.dcd
 
-# Clean up any temp files used in concatenating trajectories
-rm temp_*.dcd
+# source directory list
+y=$(head -n 1 ../.dir_list.txt) 
+for i in $y
+do
+  index=`echo $i | sed 's/.*_//' | | sed 's/\..*//'`
+  ../Scripts/Tools/catdcd -otype dcd -o no_water_${index_no}.dcd ${index_no}_temp_*.dcd
+  ls ${index_no}_temp_*.dcd
+done
