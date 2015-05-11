@@ -18,10 +18,12 @@ vmd -dispdev text -e ../Scripts/Analysis_Scripts/a2_create_dcd_no_H_or_H2O.tcl
 echo " Merging reduced data..."
 
 # source directory list
-y=$(head -n 1 ../.dir_list.txt) 
+y=$(cat ../.dir_list.txt) 
 for i in $y
 do
-  index=`echo $i | sed 's/.*_//' | | sed 's/\..*//'`
-  ../Scripts/Tools/catdcd -otype dcd -o no_water_${index_no}.dcd ${index_no}_temp_*.dcd
-  ls ${index_no}_temp_*.dcd
+  index_no=`echo $i | sed 's/.*_//' | sed 's/\.*//'`
+  ../Scripts/Tools/catdcd -otype dcd -o no_water_${index_no}.dcd ${index_no}_temp_*.dcd &&
+    if ls ./${index_no}_temp_*.dcd 1> /dev/null 2>&1; then
+      rm ${index_no}_temp_*.dcd
+    fi
 done

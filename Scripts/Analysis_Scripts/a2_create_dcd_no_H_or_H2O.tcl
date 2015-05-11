@@ -25,7 +25,7 @@ mol addfile [ glob ../InputFiles/*pdb ] waitfor all
 
 set reduced_sel "protein"
 set sel_all [ atomselect top "$reduced_sel" ]
-reduced $sel_all no_water_no_hydrogen
+reduced $sel_all no_water
 set num_sel [$sel_all num]
 set cha_all [get_charge $sel_all ]
 puts $out " Total reduced atoms:  $num_sel \n  "
@@ -43,7 +43,7 @@ mol delete top
 
 # generates a list of dcd files that will be reduced
 
-foreach index [ lsort [glob dcdfile_list_*] ] {
+foreach index [ lsort [glob dcdfile_list_*.txt] ] {
   regexp {0.[0-9]{1,3}} $index index_no
   set fp [ open "$index" r ]
   set file_data [ read $fp ]
@@ -54,12 +54,13 @@ foreach index [ lsort [glob dcdfile_list_*] ] {
   mol new [ glob ../InputFiles/*psf ]
   set i 1
   foreach dcd $data {
-    set sel_all [ atomselect top $reduced_sel ]
-    animate read dcd ${dcd} beg 0 end -1 waitfor all top
-    if { $i < 10 } {        
-      animate write dcd ${index_no}_temp_000$i.dcd beg 0 end -1 sel $sel_all waitfor all top
-      animate delete all
-      incr i
+    if { [ string compare $dcd "" ] != 0 } {
+      set sel_all [ atomselect top $reduced_sel ]
+      animate read dcd ${dcd} beg 0 end -1 waitfor all top
+      if { $i < 10 } {        
+        animate write dcd ${index_no}_temp_000$i.dcd beg 0 end -1 sel $sel_all waitfor all top
+        animate delete all
+        incr i
       } elseif { $i < 100 } {
         animate write dcd ${index_no}_temp_00$i.dcd beg 0 end -1 sel $sel_all waitfor all top
         animate delete all
@@ -75,6 +76,7 @@ foreach index [ lsort [glob dcdfile_list_*] ] {
       }
     }
   }
+}
 
 #------------------------------------------------------------------------------
 
