@@ -10,6 +10,7 @@
 
 # Launch script: 
 
+catdcd="../Scripts/Tools/catdcd"
 source ../Scripts/common_functions.sh
 reduced="no_water"
 echo "Reading in data set..."
@@ -26,4 +27,7 @@ do
     if ls ./${index_no}_temp_*.dcd 1> /dev/null 2>&1; then
       rm ${index_no}_temp_*.dcd
     fi
+    [[ ./no_water_no_hydrogen.dcd ]] &&
+      tot_frames=$($catdcd -num ./${reduced}_${index_no}.dcd | grep "Total frames:"| awk '{print $3}')
+    echo "$tot_frames" > number_frames_${index_no}.txt
 done
