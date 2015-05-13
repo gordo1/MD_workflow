@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-04-04 14:03:34
+# MODIFIED: 2015-05-13 11:20:41
 #
 
 # write_vector --------------------------------------------------------------- {{{
@@ -347,6 +347,7 @@ proc reduced { sel fname} {
   puts -nonewline $f [$sel get index]
   close $f
   $sel writepsf $fname.psf
+  $sel writepdb $fname.pdb
 }
 
 # }}}

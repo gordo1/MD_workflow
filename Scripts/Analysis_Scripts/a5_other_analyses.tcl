@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:04:49
-# MODIFIED: 2015-05-12 10:42:19
+# MODIFIED: 2015-05-13 10:46:10
 
 # Common variables ----------------------------------------------------------- {{{
 
@@ -70,7 +70,7 @@ foreach index [ lsort [glob no_water_*.dcd] ] {
   set sel_protein [atomselect $mol "$seltext_protein"]
   set sel_backbone [atomselect $mol "$seltext_backbone"]
   set sel_CA [ atomselect $mol "$seltext_CA" ]
-  mol addfile $input.dcd first 0 last 0 waitfor all
+  mol addfile $input_psf.pdb first 0 last 0 waitfor all
 
 
   #------------------------------------------------------------------------------
@@ -104,8 +104,9 @@ foreach index [ lsort [glob no_water_*.dcd] ] {
     set first_frame [ expr ( $rmsf_fraction_count - 1 ) * $frame_incr ]
     set last_frame [ expr ( $first_frame + $frame_incr ) -1 ]
     mol addfile $input.dcd first $first_frame last $last_frame waitfor all
+    fitframes top "protein and name CA"
     rmsfscan_range $sel_CA 1 -1 "${out_dir}/rmsf_protein_backbone_${rmsf_fraction_count}of${num_rmsf_windows}_${index_no}"
-    animate delete all
+    animate delete beg 1 end -1 ;# Spare the first frame, containing ref pdb
     incr rmsf_fraction_count
   }
 
