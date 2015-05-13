@@ -3,7 +3,7 @@
 # FILE:     template.gpi
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-09-09 10:10:34
-# MODIFIED: 2015-05-12 10:50:58
+# MODIFIED: 2015-05-13 17:25:04
 
 set style data lines
 set encoding iso_8859_1
@@ -30,8 +30,12 @@ set style line 4 lc rgb "orange" lt 1 lw 2 pt 11   #orange
 BLUE = "1"
 RED = "2"
 
+# Fit Stuff
+set fit quiet
+set fit logfile '/dev/null'
+
 # Plot 1
-set term pdfcairo enhanced color dashed size 8.27,11.69
+set term pdfcairo enhanced color dashed size 8.27in,11.69in
 set output OUTPUT
 set multiplot
 set size 0.5,0.33
@@ -51,14 +55,14 @@ SECONDARYSTRUCTURE u ($0):($1*100+$2*100) w l ls 2 lc rgb "black" notitle, \
 SECONDARYSTRUCTURE u ($0):($1*100) w l ls 1 lc rgb "black" notitle
 
 # Plot 5
-# set size 0.5,0.33
-# set origin 0.5,0.66
-# set xtics out scale 1 font axis_font nomirror # Removes ytics on RHS
-# set ytics out scale 1 font axis_font nomirror # Removes xtics on top
-# set xlabel XLABEL5 font label_font
-# set ylabel YLABEL5 font label_font
-# set yrange [0:*]
-# plot FILE5 u 1:2 w l ls 1 title TITLE5
+set size 0.5,0.33
+set origin 0.5,0.66
+set xtics out scale 1 font axis_font nomirror # Removes ytics on RHS
+set ytics out scale 1 font axis_font nomirror # Removes xtics on top
+set xlabel XLABEL5 font label_font
+set ylabel YLABEL5 font label_font
+set yrange [0:*]
+plot FILE5 u 1:2 w l ls 1 title TITLE5
 
 # Plot 2
 set size 0.5,0.33
@@ -68,7 +72,14 @@ set ytics out scale 1 font axis_font nomirror # Removes xtics on top
 set xlabel XLABEL2 font label_font
 set ylabel YLABEL2 font label_font
 set yrange [0:*]
-plot FILE2 w l ls 1 title TITLE2
+rg_fit(x) = offset
+offset = 1
+gradient = 1e-2
+fit rg_fit(x) FILE2 u 1:2 every 100 via offset
+set label sprintf("plateau \@ approx %.1f {\305}", offset) at graph 0.1,0.9 font label_font
+plot FILE2 w l ls 1 title TITLE2,\
+rg_fit(x) w l lt 9 lc rgb "red" title "fit"
+unset label 1
 
 # Plot 3
 set size 0.5,0.33
@@ -78,7 +89,16 @@ set ytics out scale 1 font axis_font nomirror # Removes xtics on top
 set xlabel XLABEL3 font label_font
 set ylabel YLABEL3 font label_font
 set yrange [0:*]
-plot FILE3 u 1:2 w l ls 1 title TITLE3
+set fit quiet
+set fit logfile '/dev/null'
+rmsd_fit(x) = asymptote*(1-exp(-(kappa)*x))
+asymptote = 1e-6
+kappa = 0.01
+fit rmsd_fit(x) FILE3 u 1:2 every 100 via kappa, asymptote
+set label sprintf("plateau at approx %.1f {\305}", asymptote) at graph 0.1,0.9 font label_font
+plot FILE3 u 1:2 w l ls 1 title TITLE3,\
+rmsd_fit(x) w l lt 9 lc rgb "red" title "fit"
+unset label 1
 
 # Plot 4
 set size 1,0.33
