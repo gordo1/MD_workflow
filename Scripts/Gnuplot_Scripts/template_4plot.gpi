@@ -3,7 +3,7 @@
 # FILE:     template.gpi
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-09-09 10:10:34
-# MODIFIED: 2015-05-13 17:25:04
+# MODIFIED: 2015-05-26 11:36:29
 
 set style data lines
 set encoding iso_8859_1
@@ -16,8 +16,8 @@ BORDERWIDTH = '5'
 set border linewidth BORDERWIDTH
 
 # Font options
-axis_font = "Arial,12"
-label_font = "Arial,12"
+axis_font = "Arial,12pt"
+label_font = "Arial,12pt"
 
 # Key
 set key opaque
@@ -33,6 +33,7 @@ RED = "2"
 # Fit Stuff
 set fit quiet
 set fit logfile '/dev/null'
+set fit errorvariables
 
 # Plot 1
 set term pdfcairo enhanced color dashed size 8.27in,11.69in
@@ -76,7 +77,7 @@ rg_fit(x) = offset
 offset = 1
 gradient = 1e-2
 fit rg_fit(x) FILE2 u 1:2 every 100 via offset
-set label sprintf("plateau \@ approx %.1f {\305}", offset) at graph 0.1,0.9 font label_font
+set label sprintf("plateau \@ approx %.1f {\261} %.2f {\305}", offset, offset_err) at graph 0.1,0.9 font label_font
 plot FILE2 w l ls 1 title TITLE2,\
 rg_fit(x) w l lt 9 lc rgb "red" title "fit"
 unset label 1
@@ -95,7 +96,7 @@ rmsd_fit(x) = asymptote*(1-exp(-(kappa)*x))
 asymptote = 1e-6
 kappa = 0.01
 fit rmsd_fit(x) FILE3 u 1:2 every 100 via kappa, asymptote
-set label sprintf("plateau at approx %.1f {\305}", asymptote) at graph 0.1,0.9 font label_font
+set label sprintf("plateau at approx %.1f {\261} %.2f {\305}", asymptote, asymptote_err) at graph 0.1,0.9 font label_font
 plot FILE3 u 1:2 w l ls 1 title TITLE3,\
 rmsd_fit(x) w l lt 9 lc rgb "red" title "fit"
 unset label 1
