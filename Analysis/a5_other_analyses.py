@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-18 19:34:03
+# MODIFIED: 2015-06-19 09:14:16
 
 import os
 import sys
@@ -32,6 +32,12 @@ parser=MyParser(description="Batch analysis script. Takes output from a2 and \
 
 parser.add_argument('-v', '--verbose',  action="store_true",
         help="Increase verbosity")
+parser.add_argument('--rmsd',  action="store_true", default=False,
+        help="RMSD")
+parser.add_argument('--rmsf',  action="store_true", default=False,
+        help="RMSF")
+parser.add_argument('--sasa',  action="store_true", default=False,
+        help="SASA")
 
 result = parser.parse_args()
 
@@ -105,6 +111,7 @@ raw = "raw_analysis_data"
 processed = "processed_analysis_data"
 dir_list = "../.dir_list.txt"
 gnuplot_t = "../Scripts/Gnuplot_Scripts/template_4plot.gpi"
+analysis_script_dir = "../Scripts/Analysis_Scripts"
 
 # Checks
 for d in [raw, processed]:
@@ -113,26 +120,57 @@ for f in [dir_list, gnuplot_t]:
 	check_file(f)
 
 # Run VMD analyses
-try:
-	r = subprocess.Popen(["vmd", "-dispdev", "text", "-e", "../Scripts/Analysis_Scripts/a5_other_analyses.tcl"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	r.wait()
-	stdout, stderr = r.communicate()
-except OSError as e:
-	logging.error(e)
-	logging.error("failed")
-	sys.exit()
-else:
-	if stdout:
-		if ("reading in reduced data set:" in stdout):
-			logging.info("reading in reduced data set")
-		if ("measure rmsf: specified frames are out of range") in stdout:
-			logging.error("measure rmsf: specified frames are out of range")
-			logging.error("This usually occurs because the number of frames in each chunk is too small")
-	logging.info("VMD analyses done!")
+analysis_dict = {	"Common"	:	"{0}/analysis_common.tcl".format(analysis_script_dir),
+					"RMSD"		:	"{0}/analysis_rmsdscan.tcl".format(analysis_script_dir),
+					"RMSF"		:	"{0}/analysis_rmsfscan.tcl".format(analysis_script_dir),
+					"SASA"		:	"{0}/analysis_sasa.tcl".format(analysis_script_dir)
+					}
 
-# GNUplot
-			# print("gnuplot -e \"OUTPUT='./sim_{0}_analysis.pdf'\" -e \"SECONDARYSTRUCTURE='{1}/SecondaryStructure_{0}/SecondaryStructure.dat'\" -e \"OUTPUT_ss='{0}/sim_{1}_ss.pdf'\" -e \"YLABEL1='Percent Structure'\" -e \"XLABEL1='Simulation Frame'\" -e \"TITLE1p1='Beta'\" -e \"TITLE1p2='Coil'\" -e \"TITLE1p3='Helix'\" -e \"TITLE1p4='Turn'\" -e \"FILE2='{1}/protein_radius_gyration_{0}.txt'\" -e \"OUTPUT_rg='{0}/sim_{1}_rg.pdf'\" -e \"YLABEL2='R_{{g}} ({{\305}})'\" -e \"XLABEL2='Simulation Frame'\" -e \"TITLE2='R_{{g}}'\" -e \"FILE3='{1}/rmsd_protein_{0}.txt'\" -e \"OUTPUT_rmsd='{0}/sim_{1}_rmsd.pdf'\" -e \"OUTPUT_rmsf='{0}/sim_{1}_rmsf.pdf'\" -e \"YLABEL3='RMSD ({{\305}})'\" -e \"XLABEL3='Simulation Frame'\" -e \"TITLE3='RMSD'\" -e \"YLABEL4='RMSF ({{\305}})'\" -e \"XLABEL4='Residue No'\" -e \"FILE5='{1}/protein_sasa_{0}.txt'\" -e \"OUTPUT_sasa='{0}/sim_{1}_sasa.pdf'\" -e \"YLABEL5='SASA (units)'\" -e \"XLABEL5='Simulation Frame'\" -e \"TITLE5='SASA'\" -e \"index_no='{0}'\" -e \"raw='{1}'\" {2}".format(i, out_d, gnuplot_t))
-			# subprocess.Popen(["gnuplot -e \"OUTPUT='./sim_{0}_analysis.pdf'\" -e \"SECONDARYSTRUCTURE='{1}/SecondaryStructure_{0}/SecondaryStructure.dat'\" -e \"OUTPUT_ss='{0}/sim_{1}_ss.pdf'\" -e \"YLABEL1='Percent Structure'\" -e \"XLABEL1='Simulation Frame'\" -e \"TITLE1p1='Beta'\" -e \"TITLE1p2='Coil'\" -e \"TITLE1p3='Helix'\" -e \"TITLE1p4='Turn'\" -e \"FILE2='{1}/protein_radius_gyration_{0}.txt'\" -e \"OUTPUT_rg='{0}/sim_{1}_rg.pdf'\" -e \"YLABEL2='R_{{g}} ({{\305}})'\" -e \"XLABEL2='Simulation Frame'\" -e \"TITLE2='R_{{g}}'\" -e \"FILE3='{1}/rmsd_protein_{0}.txt'\" -e \"OUTPUT_rmsd='{0}/sim_{1}_rmsd.pdf'\" -e \"OUTPUT_rmsf='{0}/sim_{1}_rmsf.pdf'\" -e \"YLABEL3='RMSD ({{\305}})'\" -e \"XLABEL3='Simulation Frame'\" -e \"TITLE3='RMSD'\" -e \"YLABEL4='RMSF ({{\305}})'\" -e \"XLABEL4='Residue No'\" -e \"FILE5='{1}/protein_sasa_{0}.txt'\" -e \"OUTPUT_sasa='{0}/sim_{1}_sasa.pdf'\" -e \"YLABEL5='SASA (units)'\" -e \"XLABEL5='Simulation Frame'\" -e \"TITLE5='SASA'\" -e \"index_no='{0}'\" -e \"raw='{1}'\" {2}".format(i, out_d, gnuplot_t)], shell=True)
+
+if result.rmsd:
+	try:
+		r = subprocess.Popen([
+			"vmd", 
+			"-dispdev", 
+			"text", 
+			"-e", 
+			analysis_dict["RMSD"]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		r.wait()
+		stdout, stderr = r.communicate()
+	except OSError as e:
+		logging.error(e)
+		logging.error("failed")
+		sys.exit()
+
+if result.rmsf:
+	try:
+		r = subprocess.Popen([
+			"vmd", 
+			"-dispdev", 
+			"text", 
+			"-e", 
+			analysis_dict["RMSF"]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		r.wait()
+		stdout, stderr = r.communicate()
+	except OSError as e:
+		logging.error(e)
+		logging.error("failed")
+		sys.exit()
+
+if result.sasa:
+	try:
+		r = subprocess.Popen([
+			"vmd", 
+			"-dispdev", 
+			"text", 
+			"-e", 
+			analysis_dict["SASA"]], stderr=subprocess.PIPE)
+		r.wait()
+		stdout, stderr = r.communicate()
+	except OSError as e:
+		logging.error(e)
+		logging.error("failed")
+		sys.exit()
 
 with open(dir_list) as f:
 	for line in f:
@@ -166,7 +204,7 @@ with open(dir_list) as f:
 					'ymin'	:	0,
 					'ofile'	:	'{0}/sasa_plot_{1}'.format(out_d, i)}
 
-			for dict in [rg_dict, rmsd_dict]:
+			for dict in [rmsd_dict]:
 				data = np.loadtxt(dict['Filename'])
 				
 				# def func(x, A, kappa):
@@ -195,9 +233,9 @@ with open(dir_list) as f:
 				plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
 				plt.xticks(fontsize=14)
 				plt.yticks(fontsize=14)
-				curve_y = func(x, A, kappa)
+				# curve_y = func(x, A, kappa)
 				plt.plot(data[:,0]/10, data[:,1,], lw=2)
-				plt.plot(x, curve_y, ' ', lw=3)
+				# plt.plot(x, curve_y, ' ', lw=3)
 				plt.ylim(dict['ymin'])
 				ax.spines["top"].set_visible(False)
 				plt.savefig('{0}.pdf'.format(dict['ofile']))
