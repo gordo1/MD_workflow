@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-22 08:23:59
+# MODIFIED: 2015-06-21 21:39:39
 
 import os
 import sys
@@ -253,7 +253,7 @@ with open(dir_list) as f:
 					    a.append(rmsf_file)
 					for fname in a:
 					    if os.path.isfile(fname):
-					        oname = os.path.splitext(item)[0]
+					        oname = os.path.splitext(fname)[0]
 					        data = np.loadtxt('{0}.txt'.format(oname))
 					        path, prefix = os.path.split('{0}.txt'.format(oname))
 					        ax = plt.subplot(111)
