@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-19 17:53:24
+# MODIFIED: 2015-06-21 19:39:07
 
 import os
 import sys
@@ -250,29 +250,23 @@ with open(dir_list) as f:
 				if glob.glob('{0}*'.format(dict['Filename'])):
 					a = []
 					for rmsf_file in glob.glob('{0}*'.format(dict['Filename'])):
-						a.append(rmsf_file)
-					for item in a:
-						if os.path.isfile(item):
-							oname = os.path.splitext(item)[0]
-							print oname
-							data = np.loadtxt('{0}.txt'.format(oname))
-							path, prefix = os.path.split('{0}.txt'.format(oname))
-							ax = plt.subplot(111)
-							ax.spines["top"].set_visible(False)
-							ax.spines["right"].set_visible(False)
-							ax.get_xaxis().tick_bottom()  
-							ax.get_yaxis().tick_left()
-							plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
-							plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
-							plt.xticks(fontsize=14)
-							plt.yticks(fontsize=14)
-							plt.plot(data[:,0]/10, data[:,1,], lw=2)
-							plt.ylim(dict['ymin'])
-							ax.spines["top"].set_visible(False)
-							plt.savefig('{0}/{1}.pdf'.format(out_d, prefix))
-							plt.close()
-		except OSError as e:
-			logging.error(e)
-			
+					    a.append(rmsf_file)
+					for fname in a:
+					    if os.path.isfile(fname):
+					        oname = os.path.splitext(item)[0]
+					        data = np.loadtxt('{0}.txt'.format(oname))
+					        path, prefix = os.path.split('{0}.txt'.format(oname))
+					        ax = plt.subplot(111)
+					        ax.spines["right"].set_visible(False)
+					        ax.get_xaxis().tick_bottom()  
+					        ax.get_yaxis().tick_left()
+					        plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
+					        plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
+					        plt.xticks(fontsize=14)
+					        plt.yticks(fontsize=14)
+					        plt.plot(data[:,0]/10, data[:,1,], lw=2)
+					plt.ylim(dict['ymin'])
+					plt.savefig('{0}/{1}.pdf'.format(out_d, prefix))
+					plt.close()
 		except OSError as e:
 			logging.error(e)
