@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-21 20:50:07
+# MODIFIED: 2015-06-22 08:16:44
 
 import os
 import sys
@@ -127,10 +127,8 @@ for l in dcdfile_list:
                     catdcd,
 		    '-otype',
 		    'dcd',
-                    '-stride',
-		    '{2}',
 		    '-o',
-		    '{0}_temp_{1:04d}.dcd'.format(i, iter, result.stride),
+		    '{0}_temp_{1:04d}.dcd'.format(i, iter),
 		    dcd
 		    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		r.wait()
@@ -141,7 +139,7 @@ for l in dcdfile_list:
 		sys.exit()
 	    iter = iter+1
     try:
-        r = subprocess.Popen('{0} -otype dcd -o no_water_{1}.dcd -dcd {1}_temp_*.dcd'.format(catdcd, i), 
+        r = subprocess.Popen('{0} -otype dcd -stride {2} -o no_water_{1}.dcd -dcd {1}_temp_*.dcd'.format(catdcd, i, result.stride), 
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         r.wait()
         stdout, stderr = r.communicate()

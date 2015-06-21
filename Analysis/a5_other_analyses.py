@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-21 19:39:07
+# MODIFIED: 2015-06-22 08:23:59
 
 import os
 import sys
@@ -249,7 +249,7 @@ with open(dir_list) as f:
 			for dict in [rmsf_dict]:
 				if glob.glob('{0}*'.format(dict['Filename'])):
 					a = []
-					for rmsf_file in glob.glob('{0}*'.format(dict['Filename'])):
+					for rmsf_file in sorted(glob.glob('{0}*'.format(dict['Filename']))):
 					    a.append(rmsf_file)
 					for fname in a:
 					    if os.path.isfile(fname):
@@ -264,9 +264,10 @@ with open(dir_list) as f:
 					        plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
 					        plt.xticks(fontsize=14)
 					        plt.yticks(fontsize=14)
-					        plt.plot(data[:,0]/10, data[:,1,], lw=2)
+					        plt.plot(data[:,0]/10, data[:,1,], lw=1,
+					                label='{0}'.format(oname))
 					plt.ylim(dict['ymin'])
-					plt.savefig('{0}/{1}.pdf'.format(out_d, prefix))
+					plt.savefig('{0}/rmsf.pdf'.format(out_d))
 					plt.close()
 		except OSError as e:
 			logging.error(e)
