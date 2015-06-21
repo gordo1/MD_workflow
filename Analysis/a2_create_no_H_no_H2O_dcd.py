@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-21 20:50:07
+# MODIFIED: 2015-06-21 21:38:30
 
 import os
 import sys
@@ -113,53 +113,53 @@ with open('../.dir_list.txt') as dir:
         dir_list.append(line)
 
 for l in dcdfile_list:
-    dir = l.rstrip('\n')
-    i = subprocess.check_output(
-            "echo {0} | sed 's/.*_//' | sed 's/\.*//' | sed 's/\.[^.]*$//'".format(dir),
-            shell=True)
-    i = i.replace('\n', '')
-    iter = 0
-    with open(l) as f:
-        for dcd in f:
-            dcd = dcd.replace('\n', '')
-            try:
-                r = subprocess.Popen([
-                    catdcd,
-		    '-otype',
-		    'dcd',
-                    '-stride',
-		    '{2}',
-		    '-o',
-		    '{0}_temp_{1:04d}.dcd'.format(i, iter, result.stride),
-		    dcd
-		    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	dir = l.rstrip('\n')
+	i = subprocess.check_output(
+			"echo {0} | sed 's/.*_//' | sed 's/\.*//' | sed 's/\.[^.]*$//'".format(dir),
+			shell=True)
+	i = i.replace('\n', '')
+	iter = 0
+	with open(l) as f:
+		for dcd in f:
+			dcd = dcd.replace('\n', '')
+			try:
+				r = subprocess.Popen([catdcd,
+					'-otype',
+					'dcd',
+					'-i',
+					'no_water.text',
+					'-stride',
+					'{0}'.format(result.stride),
+					'-o',
+					'{0}_temp_{1:04d}.dcd'.format(i, iter),
+					dcd
+					], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				r.wait()
+				stdout, stderr = r.communicate()
+			except OSError as e:
+				logging.error(e)
+				logging.error("failed")
+				sys.exit()
+			iter = iter+1
+	try:
+		r = subprocess.Popen('{0} -otype dcd -o no_water_{1}.dcd -dcd {1}_temp_????.dcd'.format(catdcd, i), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 		r.wait()
 		stdout, stderr = r.communicate()
-	    except OSError as e:
-	        logging.error(e)
+		if glob.glob('{0}_temp_*.dcd'.format(i)):
+			for idcd in glob.glob('{0}_temp_*.dcd'.format(i)):
+				delete_file(idcd)
+		try:
+			num_frames = subprocess.check_output('{0} -num no_water_{1}.dcd | grep "Total frames:"| awk \'{{print $3}}\''.format(catdcd, i), shell=True)
+			num_frames = num_frames.replace('\n', '')
+			delete_file('number_frames_{0}.txt'.format(i))
+			f = open('number_frames_{0}.txt'.format(i), 'w')
+			f.write(num_frames)
+			f.close()
+		except OSError as e:
+			logging.error(e)
+			logging.error("failed")
+			sys.exit()
+	except OSError as e:
+		logging.error(e)
 		logging.error("failed")
 		sys.exit()
-	    iter = iter+1
-    try:
-        r = subprocess.Popen('{0} -otype dcd -o no_water_{1}.dcd -dcd {1}_temp_*.dcd'.format(catdcd, i), 
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        r.wait()
-        stdout, stderr = r.communicate()
-        if glob.glob('{0}_temp_*.dcd'.format(i)):
-            for idcd in glob.glob('{0}_temp_*.dcd'.format(i)):
-                delete_file(idcd)
-        try:
-            num_frames = subprocess.check_output('{0} -num no_water_{1}.dcd | grep "Total frames:"| awk \'{{print $3}}\''.format(catdcd, i), shell=True)
-            num_frames = num_frames.replace('\n', '')
-            delete_file('number_frames_{0}.txt'.format(i))
-            f = open('number_frames_{0}.txt'.format(i), 'w')
-            f.write(num_frames)
-            f.close()
-        except OSError as e:
-            logging.error(e)
-            logging.error("failed")
-            sys.exit()
-    except OSError as e:
-        logging.error(e)
-        logging.error("failed")
-        sys.exit()
