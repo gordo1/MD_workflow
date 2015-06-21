@@ -3,7 +3,9 @@
 # FILE:     analysis_rgscan.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-18 20:48:18
-# MODIFIED: 2015-06-18 20:48:58
+# MODIFIED: 2015-06-19 17:07:30
+
+source ../Scripts/Analysis_Scripts/common_analysis.tcl
 
 foreach index [ lsort [glob no_water_*.dcd] ] {
   regexp {0.[0-9]{1,3}} $index index_no

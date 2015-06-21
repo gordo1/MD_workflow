@@ -3,7 +3,7 @@
 # FILE:     common_analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-18 20:31:02
-# MODIFIED: 2015-06-18 20:39:36
+# MODIFIED: 2015-06-19 17:13:51
 
 # Common variables ----------------------------------------------------------- {{{
 
@@ -35,9 +35,7 @@ proc filecheck { filename } {
 # Else, make the directory
 proc dir_make { dir } {
   if { [ file isdirectory $dir ] } {
-    file delete -force $dir
-    puts "Deleted $dir"
-    file mkdir $dir
+    puts "Directory $dir already exists!"
   } else {
     file mkdir $dir
   }

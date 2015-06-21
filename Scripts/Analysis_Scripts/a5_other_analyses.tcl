@@ -3,7 +3,7 @@
 # FILE:     a5_other_analyses.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 22:04:49
-# MODIFIED: 2015-05-13 10:46:10
+# MODIFIED: 2015-06-17 16:53:45
 
 # Common variables ----------------------------------------------------------- {{{
 
@@ -76,10 +76,10 @@ foreach index [ lsort [glob no_water_*.dcd] ] {
   #------------------------------------------------------------------------------
 
   # RMSD scan
-  filecheck rmsd_protein_${index_no}.txt
-  bigdcd rmsdscan_bigdcd $input.dcd
-  bigdcd_wait
-  file rename "rmsd_protein.txt" "${out_dir}/rmsd_protein_${index_no}.txt"
+  # filecheck rmsd_protein_${index_no}.txt
+  # bigdcd rmsdscan_bigdcd $input.dcd
+  # bigdcd_wait
+  # file rename "rmsd_protein.txt" "${out_dir}/rmsd_protein_${index_no}.txt"
 
   # Radius of gyration scan
   filecheck protein_radius_gyration_${index_no}.txt
@@ -111,15 +111,15 @@ foreach index [ lsort [glob no_water_*.dcd] ] {
   }
 
   # Calculates secondary structure over course of entire simulation
-  filecheck ${out_dir}/sec_structure_${index_no}.dat
-  dircheck ${out_dir}/SecondaryStructure
-  filecheck ${out_dir}/SecondaryStructure_${index_no}/betaPercent.plt
-  filecheck ${out_dir}/SecondaryStructure_${index_no}/coilPercent.plt
-  filecheck ${out_dir}/SecondaryStructure_${index_no}/helixPercent.plt
-  filecheck ${out_dir}/SecondaryStructure_${index_no}/turnPercent.plt
-  bigdcd ss_calc_bigdcd $input.dcd
-  bigdcd_wait
-  file rename -force "SecondaryStructure" "${out_dir}/SecondaryStructure_${index_no}"
+  # filecheck ${out_dir}/sec_structure_${index_no}.dat
+  # dircheck ${out_dir}/SecondaryStructure
+  # filecheck ${out_dir}/SecondaryStructure_${index_no}/betaPercent.plt
+  # filecheck ${out_dir}/SecondaryStructure_${index_no}/coilPercent.plt
+  # filecheck ${out_dir}/SecondaryStructure_${index_no}/helixPercent.plt
+  # filecheck ${out_dir}/SecondaryStructure_${index_no}/turnPercent.plt
+  # bigdcd ss_calc_bigdcd $input.dcd
+  # bigdcd_wait
+  # file rename -force "SecondaryStructure" "${out_dir}/SecondaryStructure_${index_no}"
 
   # Time-dependent SASA-scan for entire simulation
   # filecheck ${out_dir}/protein_sasa_${index_no}.txt

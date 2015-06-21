@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-19 09:14:16
+# MODIFIED: 2015-06-19 17:53:24
 
 import os
 import sys
@@ -13,6 +13,7 @@ import subprocess
 import shutil
 import time
 import shlex
+import glob
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,6 +39,8 @@ parser.add_argument('--rmsf',  action="store_true", default=False,
         help="RMSF")
 parser.add_argument('--sasa',  action="store_true", default=False,
         help="SASA")
+parser.add_argument('--rg',  action="store_true", default=False,
+        help="Rg")
 
 result = parser.parse_args()
 
@@ -116,6 +119,7 @@ analysis_script_dir = "../Scripts/Analysis_Scripts"
 # Checks
 for d in [raw, processed]:
 	delete_dir(d)
+	make_dir(d)
 for f in [dir_list, gnuplot_t]:
 	check_file(f)
 
@@ -123,7 +127,8 @@ for f in [dir_list, gnuplot_t]:
 analysis_dict = {	"Common"	:	"{0}/analysis_common.tcl".format(analysis_script_dir),
 					"RMSD"		:	"{0}/analysis_rmsdscan.tcl".format(analysis_script_dir),
 					"RMSF"		:	"{0}/analysis_rmsfscan.tcl".format(analysis_script_dir),
-					"SASA"		:	"{0}/analysis_sasa.tcl".format(analysis_script_dir)
+					"SASA"		:	"{0}/analysis_sasa.tcl".format(analysis_script_dir),
+					"Rg"		:	"{0}/analysis_rgscan.tcl".format(analysis_script_dir)
 					}
 
 
@@ -149,7 +154,7 @@ if result.rmsf:
 			"-dispdev", 
 			"text", 
 			"-e", 
-			analysis_dict["RMSF"]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			analysis_dict["RMSF"]], stderr=subprocess.PIPE)
 		r.wait()
 		stdout, stderr = r.communicate()
 	except OSError as e:
@@ -172,6 +177,21 @@ if result.sasa:
 		logging.error("failed")
 		sys.exit()
 
+if result.rg:
+	try:
+		r = subprocess.Popen([
+			"vmd", 
+			"-dispdev", 
+			"text", 
+			"-e", 
+			analysis_dict["Rg"]], stderr=subprocess.PIPE)
+		r.wait()
+		stdout, stderr = r.communicate()
+	except OSError as e:
+		logging.error(e)
+		logging.error("failed")
+		sys.exit()
+
 with open(dir_list) as f:
 	for line in f:
 		line = line.rstrip('\n')
@@ -182,63 +202,77 @@ with open(dir_list) as f:
 		i = i.replace('\n', '')
 		out_d = "{0}/sim_{1}".format(processed, i)
 		make_dir(out_d)
+
 		try:
 			rg_dict = {'Filename': '{0}/sim_{1}/protein_radius_gyration_{1}.txt'.format(raw, i), 
+					'Result':	'result.rg',
 					'xlabel':	'Simulation time (ns)',
 					'ylabel':	'R$_g$ ($\AA$)',
 					'ymin'	:	0,
 					'ofile'	:	'{0}/rg_plot_{1}'.format(out_d, i)}
 			rmsd_dict = {'Filename': '{0}/sim_{1}/rmsd_protein_{1}.txt'.format(raw, i), 
+					'Result':	'result.rmsd',
 					'xlabel':	'Simulation time (ns)',
 					'ylabel':	'RMSD ($\AA$)',
 					'ymin'	:	0,
 					'ofile'	:	'{0}/rmsd_plot_{1}'.format(out_d, i)}
-			rmsf_dict = {'Filename': '{0}/sim_{1}/rmsd_protein_{1}.txt'.format(raw, i), 
+			rmsf_dict = {'Filename': '{0}/sim_{1}/rmsf_protein_backbone_'.format(raw, i), 
+					'Result':	'result.rmsf',
 					'xlabel':	'Simulation time (ns)',
 					'ylabel':	'RMSD ($\AA$)',
 					'ymin'	:	0,
-					'ofile'	:	'{0}/rmsd_plot_{1}'.format(out_d, i)}
+					'ofile'	:	'{0}/rmsf_plot_{1}'.format(out_d, i)}
 			sasa_dict = {'Filename': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(raw, i), 
+					'Result':	'result.sasa',
 					'xlabel':	'Simulation time (ns)',
 					'ylabel':	'Solvent-accessible surface area ($\AA^2$)',
 					'ymin'	:	0,
 					'ofile'	:	'{0}/sasa_plot_{1}'.format(out_d, i)}
 
-			for dict in [rmsd_dict]:
-				data = np.loadtxt(dict['Filename'])
-				
-				# def func(x, A, kappa):
-				# 	return A*np.exp(-1*kappa*x)
-
-				# x = data[:,0]/10
-				# y = data[:,1]
-
-				# popt, pcov = curve_fit(func, x, y, p0=(0.01, 0.000001))
-
-				# print(popt)
-
-				# A = popt[1]
-				# kappa = popt[0]
-				# residuals = y - func(x, A, kappa)
-				# fres = sum(residuals**2)
-
-				# print(fres)
-
-				ax = plt.subplot(111)
-				ax.spines["top"].set_visible(False)
-				ax.spines["right"].set_visible(False)
-				ax.get_xaxis().tick_bottom()  
-				ax.get_yaxis().tick_left()
-				plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
-				plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
-				plt.xticks(fontsize=14)
-				plt.yticks(fontsize=14)
-				# curve_y = func(x, A, kappa)
-				plt.plot(data[:,0]/10, data[:,1,], lw=2)
-				# plt.plot(x, curve_y, ' ', lw=3)
-				plt.ylim(dict['ymin'])
-				ax.spines["top"].set_visible(False)
-				plt.savefig('{0}.pdf'.format(dict['ofile']))
-				plt.close()
+			for dict in [rmsd_dict, sasa_dict, rg_dict]:
+				if os.path.isfile(dict['Filename']):
+					data = np.loadtxt(dict['Filename'])
+					ax = plt.subplot(111)
+					ax.spines["top"].set_visible(False)
+					ax.spines["right"].set_visible(False)
+					ax.get_xaxis().tick_bottom()  
+					ax.get_yaxis().tick_left()
+					plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
+					plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
+					plt.xticks(fontsize=14)
+					plt.yticks(fontsize=14)
+					plt.plot(data[:,0]/10, data[:,1,], lw=2)
+					plt.ylim(dict['ymin'])
+					ax.spines["top"].set_visible(False)
+					plt.savefig('{0}.pdf'.format(dict['ofile']))
+					plt.close()
+			for dict in [rmsf_dict]:
+				if glob.glob('{0}*'.format(dict['Filename'])):
+					a = []
+					for rmsf_file in glob.glob('{0}*'.format(dict['Filename'])):
+						a.append(rmsf_file)
+					for item in a:
+						if os.path.isfile(item):
+							oname = os.path.splitext(item)[0]
+							print oname
+							data = np.loadtxt('{0}.txt'.format(oname))
+							path, prefix = os.path.split('{0}.txt'.format(oname))
+							ax = plt.subplot(111)
+							ax.spines["top"].set_visible(False)
+							ax.spines["right"].set_visible(False)
+							ax.get_xaxis().tick_bottom()  
+							ax.get_yaxis().tick_left()
+							plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
+							plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
+							plt.xticks(fontsize=14)
+							plt.yticks(fontsize=14)
+							plt.plot(data[:,0]/10, data[:,1,], lw=2)
+							plt.ylim(dict['ymin'])
+							ax.spines["top"].set_visible(False)
+							plt.savefig('{0}/{1}.pdf'.format(out_d, prefix))
+							plt.close()
+		except OSError as e:
+			logging.error(e)
+			
 		except OSError as e:
 			logging.error(e)
