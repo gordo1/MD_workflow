@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-22 15:01:52
+# MODIFIED: 2015-06-22 17:24:14
 
 import os
 import sys
@@ -221,6 +221,7 @@ with open(dir_list) as f:
 					'xlabel':	'Residue No.',
 					'ylabel':	'RMSF ($\AA$)',
 					'ymin'	:	0,
+					'ymax'	:	10,
 					'ofile'	:	'{0}/rmsf_plot_{1}'.format(out_d, i)}
 			sasa_dict = {'Filename': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(raw, i), 
 					'Result':	'result.sasa',
@@ -252,6 +253,7 @@ with open(dir_list) as f:
 					for rmsf_file in sorted(glob.glob('{0}*'.format(dict['Filename']))):
 					    a.append(rmsf_file)
 					n = 5
+					count = 1
 					color=iter(plt.cm.Blues(np.linspace(0,1,n)))
 					for fname in a:
 					    if os.path.isfile(fname):
@@ -268,9 +270,14 @@ with open(dir_list) as f:
 					        plt.xticks(fontsize=14)
 					        plt.yticks(fontsize=14)
 					        plt.plot(data[:,0], data[:,1,], lw=1, c=c,
-					                label='{0}'.format(oname))
-					ax.legend(loc='upper center', shadow=True)
-					plt.ylim(dict['ymin'])
+					                label='Fraction {0} of 5'.format(count))
+					        count = count + 1
+					legend = ax.legend(loc='upper left', shadow=True)
+					for label in legend.get_texts():
+						label.set_fontsize('small')
+					for label in legend.get_lines():
+						label.set_linewidth(1)
+					plt.ylim(dict['ymin'], dict['ymax'])
 					plt.savefig('{0}/rmsf.pdf'.format(out_d))
 					plt.close()
 		except OSError as e:
