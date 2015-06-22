@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-21 21:39:39
+# MODIFIED: 2015-06-22 15:01:52
 
 import os
 import sys
@@ -218,8 +218,8 @@ with open(dir_list) as f:
 					'ofile'	:	'{0}/rmsd_plot_{1}'.format(out_d, i)}
 			rmsf_dict = {'Filename': '{0}/sim_{1}/rmsf_protein_backbone_'.format(raw, i), 
 					'Result':	'result.rmsf',
-					'xlabel':	'Simulation time (ns)',
-					'ylabel':	'RMSD ($\AA$)',
+					'xlabel':	'Residue No.',
+					'ylabel':	'RMSF ($\AA$)',
 					'ymin'	:	0,
 					'ofile'	:	'{0}/rmsf_plot_{1}'.format(out_d, i)}
 			sasa_dict = {'Filename': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(raw, i), 
@@ -251,8 +251,11 @@ with open(dir_list) as f:
 					a = []
 					for rmsf_file in sorted(glob.glob('{0}*'.format(dict['Filename']))):
 					    a.append(rmsf_file)
+					n = 5
+					color=iter(plt.cm.Blues(np.linspace(0,1,n)))
 					for fname in a:
 					    if os.path.isfile(fname):
+					    	c=next(color)
 					        oname = os.path.splitext(fname)[0]
 					        data = np.loadtxt('{0}.txt'.format(oname))
 					        path, prefix = os.path.split('{0}.txt'.format(oname))
@@ -264,8 +267,9 @@ with open(dir_list) as f:
 					        plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
 					        plt.xticks(fontsize=14)
 					        plt.yticks(fontsize=14)
-					        plt.plot(data[:,0]/10, data[:,1,], lw=1,
+					        plt.plot(data[:,0], data[:,1,], lw=1, c=c,
 					                label='{0}'.format(oname))
+					ax.legend(loc='upper center', shadow=True)
 					plt.ylim(dict['ymin'])
 					plt.savefig('{0}/rmsf.pdf'.format(out_d))
 					plt.close()
