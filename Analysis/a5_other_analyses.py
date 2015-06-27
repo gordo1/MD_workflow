@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-22 17:24:14
+# MODIFIED: 2015-06-27 21:03:53
 
 import os
 import sys
@@ -15,6 +15,7 @@ import time
 import shlex
 import glob
 import matplotlib
+matplotlib.use('Agg')	# For non-interactive backends
 import matplotlib.pyplot as plt
 import numpy as np
 import math
