@@ -3,7 +3,7 @@
 # FILE:     analysis_secondarystructurescan.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-18 20:49:27
-# MODIFIED: 2015-06-28 14:07:52
+# MODIFIED: 2015-06-28 15:45:49
 #
 source ../Scripts/Analysis_Scripts/common_analysis.tcl
 
@@ -31,7 +31,7 @@ foreach index [ lsort [glob no_water_*.dcd] ] {
   filecheck ${out_dir}/SecondaryStructure_${index_no}/turnPercent.plt
   bigdcd ss_calc_bigdcd $input.dcd
   bigdcd_wait
-  file rename -force "SecondaryStructure" "${out_dir}/SecondaryStructure_${index_no}"
+  file rename -force "SecondaryStructure" "${out_dir}/SecondaryStructure"
 }
 
 exit
