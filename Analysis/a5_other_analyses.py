@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-28 16:08:16
+# MODIFIED: 2015-06-28 16:33:03
 
 import os
 import sys
@@ -268,7 +268,7 @@ with open(dir_list) as f:
                     # Row-wise read in ss elements into array ss
                     ss = np.row_stack([data_h, data_b, data_c, data_t])
                     # Dummy Y-data for plotting
-                    y = np.arange(len(ss))
+                    y = np.arange(len(ss[1]))
                     # Use more appropriate RGBY colour palette
                     plt.rc('axes', color_cycle=['r', 'g', 'b', 'y'])
                     ax = plt.subplot(111)
@@ -280,7 +280,7 @@ with open(dir_list) as f:
                     plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
                     plt.xticks(fontsize=14)
                     plt.yticks(fontsize=14)
-                    plt.stackplot(Y, ss, lw=0.1, alpha=0.7)
+                    plt.stackplot(y, ss, lw=0.1, alpha=0.7)
                     # Hack to give labels for ss elements
                     plt.plot([], [], color='r', alpha=0.5, lw=10,label='helix')
                     plt.plot([], [], color='b', alpha=0.7, linewidth=10,label='coil')
