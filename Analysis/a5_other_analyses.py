@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-06-28 16:33:03
+# MODIFIED: 2015-07-11 22:36:35
 
 import os
 import sys
@@ -36,14 +36,24 @@ parser.add_argument('-v', '--verbose',  action="store_true",
         help="Increase verbosity")
 parser.add_argument('--rmsd',  action="store_true", default=False,
         help="RMSD")
+parser.add_argument('--selection',  action="store_true", default='protein',
+        help="""
+        Protein selection to use in analyses. Must be a valid selection.
+        At present, there are no explicit checks for making sure what you pass 
+        is valid. Very fragile!
+        """)
 parser.add_argument('--rmsf',  action="store_true", default=False,
-        help="RMSF")
+        help="""
+        RMSF.
+        """)
 parser.add_argument('--sasa',  action="store_true", default=False,
         help="SASA")
 parser.add_argument('--rg',  action="store_true", default=False,
         help="Rg")
 parser.add_argument('--ss',  action="store_true", default=False,
-        help="Secondary structure scan using Stride.")
+        help="""
+        Secondary structure scan using Stride.
+        """)
 
 result = parser.parse_args()
 
@@ -140,9 +150,8 @@ analysis_dict = {
 if result.rmsd:
     try:
         r = subprocess.Popen([
-            "vmd", "-dispdev", "text", "-e", 
-            analysis_dict["RMSD"]
-            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            'vmd', '-dispdev', 'text', '-e', analysis_dict["RMSD"], '-arg',
+            result.selection], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         r.wait()
         stdout, stderr = r.communicate()
     except OSError as e:
