@@ -3,18 +3,18 @@
 # FILE:     analysis_rmsdscan.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-18 20:40:17
-# MODIFIED: 2015-07-11 22:45:51
+# MODIFIED: 2015-07-11 23:00:40
 
 source ../Scripts/Analysis_Scripts/common_analysis.tcl
 
 # Sequentially read in args as $1, $2, etc.
-set i 0; foreach n $argv {set [incr i] $n}
+# set i 0; foreach n $argv {set [incr i] $n}
 
 foreach index [ lsort [glob no_water_*.dcd] ] {
   regexp {0.[0-9]{1,3}} $index index_no
 
   # Variable definitions for later
-  set seltext ${1}
+  set seltext $argv
   set input "no_water_$index_no"
   set out_dir "$raw/sim_$index_no"
   dir_make $out_dir

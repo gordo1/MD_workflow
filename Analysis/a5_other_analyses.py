@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-07-11 22:36:35
+# MODIFIED: 2015-07-12 11:22:46
 
 import os
 import sys
@@ -36,7 +36,7 @@ parser.add_argument('-v', '--verbose',  action="store_true",
         help="Increase verbosity")
 parser.add_argument('--rmsd',  action="store_true", default=False,
         help="RMSD")
-parser.add_argument('--selection',  action="store_true", default='protein',
+parser.add_argument('-s', '--selection', default='protein',
         help="""
         Protein selection to use in analyses. Must be a valid selection.
         At present, there are no explicit checks for making sure what you pass 
@@ -147,11 +147,16 @@ analysis_dict = {
     }
 
 
+l = result.selection.split()
+
 if result.rmsd:
     try:
-        r = subprocess.Popen([
-            'vmd', '-dispdev', 'text', '-e', analysis_dict["RMSD"], '-arg',
-            result.selection], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        r = subprocess.Popen(['vmd -dispdev text -e {script} -args \"\"{sel}\"\"'.format(
+        	script = analysis_dict["RMSD"], 
+        	sel = result.selection)], 
+        	stdout=subprocess.PIPE, 
+        	stderr=subprocess.PIPE, 
+        	shell=True)
         r.wait()
         stdout, stderr = r.communicate()
     except OSError as e:
@@ -161,16 +166,31 @@ if result.rmsd:
 
 if result.rmsf:
     try:
-        r = subprocess.Popen([
-            "vmd", "-dispdev", "text", "-e", 
-            analysis_dict["RMSF"]
-            ], stderr=subprocess.PIPE)
+        r = subprocess.Popen(['vmd -dispdev text -e {script} -args \"\"{sel}\"\"'.format(
+        	script = analysis_dict["RMSF"], 
+        	sel = result.selection)], 
+        	stdout=subprocess.PIPE, 
+        	stderr=subprocess.PIPE, 
+        	shell=True)
         r.wait()
         stdout, stderr = r.communicate()
     except OSError as e:
         logging.error(e)
         logging.error("failed")
         sys.exit()
+
+# if result.rmsf:
+#     try:
+#         r = subprocess.Popen([
+#             "vmd", "-dispdev", "text", "-e", 
+#             analysis_dict["RMSF"]
+#             ], stderr=subprocess.PIPE)
+#         r.wait()
+#         stdout, stderr = r.communicate()
+#     except OSError as e:
+#         logging.error(e)
+#         logging.error("failed")
+#         sys.exit()
 
 if result.sasa:
     try:
@@ -239,6 +259,7 @@ with open(dir_list) as f:
                     'ofile'	:   '{0}/rmsd_plot_{1}'.format(out_d, i)}
             rmsf_dict = {
                     'Filename': '{0}/sim_{1}/rmsf_protein_backbone_'.format(raw, i), 
+                    'File_all': '{0}/sim_{1}/rmsf_all_protein_backbone'.format(raw, i), 
                     'Result':   'result.rmsf',
                     'xlabel':   'Residue No.',
                     'ylabel':   'RMSF ($\AA$)',
@@ -340,16 +361,29 @@ with open(dir_list) as f:
                             data = np.loadtxt('{0}.txt'.format(oname))
                             path, prefix = os.path.split('{0}.txt'.format(oname))
                             ax = plt.subplot(111)
-                            ax.spines["right"].set_visible(False)
-                            ax.get_xaxis().tick_bottom()  
-                            ax.get_yaxis().tick_left()
-                            plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
-                            plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
-                            plt.xticks(fontsize=14)
-                            plt.yticks(fontsize=14)
                             plt.plot(data[:,0], data[:,1,], lw=1, c=c,
                                     label='Fraction {0} of 5'.format(count))
                             count = count + 1
+                    if glob.glob('{0}*'.format(dict['File_all'])):
+                    	b = []
+                    	for rmsf_file in glob.glob('{0}*'.format(dict['File_all'])):
+                    		b.append(rmsf_file)
+                    	for fname in b:
+							if os.path.isfile(fname):
+								oname = os.path.splitext(fname)[0]
+								data = np.loadtxt('{0}.txt'.format(oname))
+								path, prefix = os.path.split('{0}.txt'.format(oname))
+								ax = plt.subplot(111)
+								plt.plot(data[:,0], data[:,1,], lw=1, c='r',
+                                    label='All')
+                    plt.xlabel('{0}'.format(dict['xlabel']), fontsize=16)
+                    plt.ylabel('{0}'.format(dict['ylabel']), fontsize=16)
+                    ax.get_xaxis().tick_bottom()  
+                    ax.get_yaxis().tick_left()
+                    ax.spines["top"].set_visible(False)
+                    ax.spines["right"].set_visible(False)
+                    plt.xticks(fontsize=14)
+                    plt.yticks(fontsize=14)
                     legend = ax.legend(loc='upper left', shadow=True)
                     for label in legend.get_texts():
                         label.set_fontsize('small')
