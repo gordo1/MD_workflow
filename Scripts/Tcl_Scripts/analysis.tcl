@@ -3,7 +3,7 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-05-13 11:20:41
+# MODIFIED: 2015-07-26 16:40:42
 #
 
 # write_vector --------------------------------------------------------------- {{{
@@ -51,6 +51,24 @@ proc sasa_scan_bigdcd { frame } {
   global sel_protein
   set fd [ open "protein_sasa.txt" a ]
   puts $fd "$frame [ measure sasa 1.4 $sel_protein ]"
+  close $fd
+}
+
+# Per-residue sasa scan
+
+proc sasa_resid_scan_bigdcd { frame } {
+  global sel_protein 
+  set sel [ atomselect top "protein and $sel_protein and name CA" ]
+  set fd [ open "resid_protein_sasa.txt" a ]
+  set rlist [ $sel get resid ]
+  set sasa ""
+  foreach r $rlist {
+    set r_sel [ atomselect top "protein and resid $r" ]
+    set r_sasa [ format %.2f [measure sasa 1.4 $r_sel] ]
+    append sasa "$r_sasa" ","
+    unset r_sasa
+  }
+  puts $fd $sasa
   close $fd
 }
 

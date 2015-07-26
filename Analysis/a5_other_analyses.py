@@ -3,7 +3,7 @@
 # FILE:     a1_other_analyses.py
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-16 21:46:32
-# MODIFIED: 2015-07-12 11:22:46
+# MODIFIED: 2015-07-26 16:44:27
 
 import os
 import sys
@@ -48,6 +48,8 @@ parser.add_argument('--rmsf',  action="store_true", default=False,
         """)
 parser.add_argument('--sasa',  action="store_true", default=False,
         help="SASA")
+parser.add_argument('--rsasa',  action="store_true", default=False,
+        help="Residue-level SASA")
 parser.add_argument('--rg',  action="store_true", default=False,
         help="Rg")
 parser.add_argument('--ss',  action="store_true", default=False,
@@ -142,6 +144,7 @@ analysis_dict = {
     "RMSD"  :   "{0}/analysis_rmsdscan.tcl".format(analysis_script_dir),
     "RMSF"  :   "{0}/analysis_rmsfscan.tcl".format(analysis_script_dir),
     "SASA"  :   "{0}/analysis_sasa.tcl".format(analysis_script_dir),
+    "R_SASA"  :   "{0}/analysis_rsasa.tcl".format(analysis_script_dir),
     "Rg"    :   "{0}/analysis_rgscan.tcl".format(analysis_script_dir),
     "SS"    :   "{0}/analysis_secondarystructurescan.tcl".format(analysis_script_dir)
     }
@@ -197,6 +200,19 @@ if result.sasa:
         r = subprocess.Popen([
             "vmd", "-dispdev", "text", "-e", 
             analysis_dict["SASA"]
+            ], stderr=subprocess.PIPE)
+        r.wait()
+        stdout, stderr = r.communicate()
+    except OSError as e:
+        logging.error(e)
+        logging.error("failed")
+        sys.exit()
+
+if result.rsasa:
+    try:
+        r = subprocess.Popen([
+            "vmd", "-dispdev", "text", "-e", 
+            analysis_dict["RSASA"]
             ], stderr=subprocess.PIPE)
         r.wait()
         stdout, stderr = r.communicate()
@@ -269,6 +285,13 @@ with open(dir_list) as f:
             sasa_dict = {
                     'Filename': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(raw, i), 
                     'Result':   'result.sasa',
+                    'xlabel':   'Simulation time (ns)',
+                    'ylabel':   'Solvent-accessible surface area ($\AA^2$)',
+                    'ymin'	:   0,
+                    'ofile'	:   '{0}/sasa_plot_{1}'.format(out_d, i)}
+            rsasa_dict = {
+                    'Filename': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(raw, i), 
+                    'Result':   'result.rsasa',
                     'xlabel':   'Simulation time (ns)',
                     'ylabel':   'Solvent-accessible surface area ($\AA^2$)',
                     'ymin'	:   0,
