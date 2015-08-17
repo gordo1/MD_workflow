@@ -3,8 +3,6 @@
 # FILE:     analysis.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
-# MODIFIED: 2015-07-26 16:40:42
-#
 
 # write_vector --------------------------------------------------------------- {{{
 
@@ -15,7 +13,6 @@ proc write_vector { vec filename } {
 }
 
 # }}}
-
 # saltbrscan ----------------------------------------------------------------- {{{
 
 proc saltbrscan { start end sel outdir } {
@@ -29,7 +26,6 @@ proc saltbrscan { start end sel outdir } {
 }
 
 # }}}
-
 # sasa_scan ------------------------------------------------------------------ {{{
  
 proc sasa_scan { seltext outfile incr } {
@@ -44,7 +40,6 @@ proc sasa_scan { seltext outfile incr } {
 }
 
 # }}}
-
 # sasa_scan_bigdcd ----------------------------------------------------------- {{{
 
 proc sasa_scan_bigdcd { frame } {
@@ -73,7 +68,6 @@ proc sasa_resid_scan_bigdcd { frame } {
 }
 
 # }}}
-
 # trajscan ------------------------------------------------------------------- {{{
 
 # Go through each frame of the trajectory
@@ -117,7 +111,8 @@ proc trajscan {a b {r 2.0}} {
 }
 
 # }}} 
-
+# trajscanstat --------------------------------------------------------------- {{{
+#
 # As above, but just return minimal information on the number of
 # frames where close fits are found.
 proc trajscanstat {a b {r 2.0}} {
@@ -140,6 +135,8 @@ puts "ratio: $ratio"
 puts "============================================="
 }
 
+# }}} 
+# trajscanstatm -------------------------------------------------------------- {{{
 # As trajscanstat, but a list of protein atom selections is passed in.
 # If all atomselections are found to be true, the frame is counted.
 proc trajscanstatm {alist b {r 2.0}} {
@@ -172,6 +169,8 @@ puts "ratio: $ratio"
 puts "============================================="
 return $hitlist
 }
+# }}} 
+# mbondscan ------------------------------------------------------------------ {{{
 
 # Go through each frame of a trajectory and output the vector
 # connecting the center of mass of two atom selections and the length
@@ -204,6 +203,9 @@ if {$writeFile==1} {
 molinfo top set frame $oldframe
 }
 
+# }}} 
+# inertiascan ---------------------------------------------------------------- {{{
+
 proc inertiascan {a b fnamedist fnameangle } {
   set oldframe [molinfo top get frame]
   set nframe [molinfo top get numframes]
@@ -225,6 +227,9 @@ close $fdist
 close $fangle
 molinfo top set frame $oldframe
 }
+
+# }}} 
+# anglescan ------------------------------------------------------------------ {{{
 
 # Go through each frame of a trajectory and output the angle between
 # the center-of-mass of the three atomselections: a,b & c.  If a file
@@ -263,6 +268,7 @@ if {$writeFile==1} {
 molinfo top set frame $oldframe
 }
 
+# }}} 
 # rgyrscan ------------------------------------------------------------------- {{{
 
 # Go through each frame of a trajectory and calculate the radius of
@@ -293,7 +299,6 @@ molinfo top set frame $oldframe
 }
 
 # }}}
-
 # rgyrscan_bigdcd ------------------------------------------------------------ {{{
 
 # Go through each frame of a trajectory and calculate the radius of
@@ -309,7 +314,6 @@ proc rgyrscan_bigdcd { frame } {
 }
 
 # }}}
-
 # dihedralscan --------------------------------------------------------------- {{{
 
 # Go through each frame of a trajectory and output the dihedral angle between
@@ -355,7 +359,6 @@ molinfo top set frame $oldframe
 }
 
 # }}}
-
 # reduced -------------------------------------------------------------------- {{{
 
 # Write the indexes for the selection, sel, to a file fname.text and
@@ -369,12 +372,14 @@ proc reduced { sel fname} {
 }
 
 # }}}
+# get_charge ----------------------------------------------------------------- {{{
 
 # get the total charge of an atomselection
 proc get_charge {sel} {
   eval "vecadd [$sel get charge]"
 }
 
+# }}} 
 # fitframes ------------------------------------------------------------------ {{{
 
 ## This takes a selection and fits that selection for every frame in the
@@ -401,7 +406,6 @@ proc fitframes { molid seltext } {
 }
 
 # }}}
-
 # fitagainst ----------------------------------------------------------------- {{{
 
 proc fitagainst { molid0 molid1 seltext } {
@@ -419,6 +423,7 @@ return
 }
 
 # }}}
+# mark_beta ------------------------------------------------------------------ {{{
 
 # for the given molid mark the beta column for the selection text to 1
 proc mark_beta { molid seltext } {
@@ -428,6 +433,9 @@ proc mark_beta { molid seltext } {
   $sel set beta 1
 }
 
+# }}}
+# write_seq ------------------------------------------------------------------ {{{
+#
 # write the sequence of the selection to fname, one line per residue
 proc write_seq { molid seltext fname } {
   set sel [atomselect $molid "$seltext and name CA"]
@@ -443,6 +451,8 @@ proc write_seq { molid seltext fname } {
 }
 close $f
 }
+# }}} 
+# rmsdscan ------------------------------------------------------------------- {{{
 
 # trajectory rmsd scan to file
 proc rmsdscan { sel mol } {
@@ -461,6 +471,7 @@ proc rmsdscan { sel mol } {
 close $f
 }
 
+# }}} 
 # rmsdscan_bigdcd ------------------------------------------------------------ {{{
 
 proc rmsdscan_bigdcd { frame } {
@@ -471,16 +482,8 @@ proc rmsdscan_bigdcd { frame } {
   puts $f "$frame $rmsd"
   close $f
 }
-# set mol [mol new protein.psf type psf waitfor all]
-# set all [atomselect $mol all]
-# set ref [atomselect $mol "name CA" frame 0]
-# set sel [atomselect $mol "name CA"]
-# mol addfile protein.pdb waitfor all
-# bigdcd myrmsd xyz eq01.xyz eq02.xyz eq03.xyz
-# bigdcd_wait
 
 # }}}
-
 # rmsfscan ------------------------------------------------------------------- {{{
 
 # per residue rmsf to file
@@ -497,7 +500,6 @@ proc rmsfscan { sel fname } {
 }
 
 # }}}
-
 # rmsfscan_range ------------------------------------------------------------- {{{
 
 # per residue rmsf to file
@@ -514,10 +516,14 @@ proc rmsfscan_range { sel start_frame end_frame fname } {
 }
 
 # }}}
+# switch_on_tube_scaling ----------------------------------------------------- {{{
 
 proc switch_on_tube_scaling { {field beta}} {
   set env(VMDMODULATERIBBON) $field
 }
+
+# }}} 
+# split_chain_fragments ------------------------------------------------------ {{{
 
 # splits molecule into multiple fragments indexed by chain and fragment id
 proc split_chain_fragments { mol } {
@@ -533,6 +539,9 @@ proc split_chain_fragments { mol } {
   }
   $all delete
 }
+
+# }}}
+# apply_beta_from_file ------------------------------------------------------- {{{
 
 # reads a two column: <resid> <data>
 # file and applies <data> to molid
@@ -553,6 +562,9 @@ proc apply_beta_from_file {fname molid} {
   }
 }
 
+# }}}
+# twitch_reps ---------------------------------------------------------------- {{{
+
 # work on the assumption that there is only one representation for
 # molid
 proc twitch_reps {molid} {
@@ -564,6 +576,9 @@ proc twitch_reps {molid} {
   mol addrep $molid
   mol smoothrep $molid 1 20
 }
+
+# }}}
+# outputcheck ---------------------------------------------------------------- {{{
 
 # basic conditional filecheck
 proc outputcheck { filename } {
@@ -577,6 +592,7 @@ proc outputcheck { filename } {
 }
 }
 
+# }}} 
 # ss_calc_bigdcd ------------------------------------------------------------- {{{
 
 # Secondary structure scan across a trajectory
@@ -614,7 +630,6 @@ proc ss_calc_bigdcd { frame } {
 }
 
 # }}}
-
 # ss_calc -------------------------------------------------------------------- {{{
 
 # Secondary structure scan across a trajectory
