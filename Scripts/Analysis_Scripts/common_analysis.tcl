@@ -5,18 +5,6 @@
 # CREATED:  2015-06-18 20:31:02
 # MODIFIED: 2015-06-19 17:13:51
 
-# Common variables ----------------------------------------------------------- {{{
-
-# Output directory for raw data files
-set raw "raw_analysis_data"
-
-# }}}
-
-# ---------------------------------------------------------------------------- {{{
-
-# read in raw data: 
-puts " reading in reduced data set:"
-
 proc dircheck { dirname } {
   if { [ file isdirectory $dirname ] } {
     file delete -force $dirname

@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 # AUTHOR:   Shane Gordon
-# FILE:     analysis_rmsfscan.tcl
+# FILE:     analysis_rmsf.tcl
 # ROLE:     TODO (some explanation)
 # CREATED:  2015-06-18 20:43:31
 # MODIFIED: 2015-07-12 10:59:46
@@ -8,11 +8,13 @@
 source ../Scripts/Analysis_Scripts/common_analysis.tcl
 
 set dcd [ lindex $argv 0 ]
-set align_seltext [ lrange $argv 1 end ]
+set raw [ lindex $argv 1 ]
+set align_seltext [ lrange $argv 2 end ]
 
 regexp {0.[0-9]{1,3}} $dcd index_no
 
 # Variable definitions for later
+set seltext "protein"
 set input $dcd
 set out_dir $raw/sim_$index_no
 set num_rmsf_windows 5
