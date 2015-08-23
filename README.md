@@ -1,21 +1,19 @@
 # MD Workflow
 
-### Version
+## Version
 
 v0.04
 
-
-### Foreword
+## Foreword
 
 Original author: Mike Kuiper (VLSCI)
 
-**Disclaimer! - I have made this workflow originally to help manage my own
-projects, - you are free to use it, but it may not be entirely suitable for
-what you are trying to achieve. Please email feedback, bugs or suggestions to:**
+**Disclaimer!** - I have made this workflow originally to help manage my own
+projects, - you are free to use it, but it may not be entirely suitable for what
+you are trying to achieve. Please email feedback, bugs or suggestions to:
 <a href="mailto:mkuiper@unimelb.edu.au">mkuiper@unimelb.edu.au</a>
 
-
-### Outline
+## Outline
 
 This project directory structure is designed to help streamline the management
 of simulation setup, running jobs, analysis and the writing of manuscripts.
@@ -23,32 +21,31 @@ Though this directory structure is optimized for NAMD operating on a large
 BlueGene/Q cluster, it could quite easily adapted for running other programs
 such as Amber and Gromacs.
 
-
-### The philosophy
+## The philosophy
 
 This folder came about to help manage and organize the running of a few to
 thousands of simultaneous molecular dynamics simulations to take advantage of
 the large capacity of the BlueGene/Q cluster.
 
-The directory structure is designed to be self-contained; that is having all
-the files necessary to run a simulation. The /Project directory is meant to be
-the area to work on manuscripts and illustrations while the `/BUILD_DIR` is
-where users can build up their simulations. The `/Setup_and_Config` directory
-is where users setup and optimize and benchmark their systems before launching
-production jobs.
+The directory structure is designed to be self-contained; that is having all the
+files necessary to run a simulation. The /Project directory is meant to be the
+area to work on manuscripts and illustrations while the `/BUILD_DIR` is where
+users can build up their simulations. The `/Setup_and_Config` directory is where
+users setup and optimize and benchmark their systems before launching production
+jobs.
 
 This directory structure is intended for a standard namd job comprising of an
-equilibration run followed by production runs. Output files are date-stamped
-and moved to various folders designed to keep data ordered so as to be able to
+equilibration run followed by production runs. Output files are date-stamped and
+moved to various folders designed to keep data ordered so as to be able to
 replicate or validate any point of the simulation.
 
-Under the `/MainJob_dir` we run our independent simulations. These variables
-are set under the `master_config_file` in the `/Setup_and_Config` directory.
-The variable *sims* sets up how many simulation directories we set up.
-The variable *runs* will set how many times we run the production script.
-For example, if in our `sim_production.conf` we set a simulation segment
-to run for 2 nanoseconds, and we set our runs to be 20, then the production
-script will be run 20 times, producing:
+Under the `/MainJob_dir` we run our independent simulations. These variables are
+set under the `master_config_file` in the `/Setup_and_Config` directory.  The
+variable *sims* sets up how many simulation directories we set up.  The variable
+*runs* will set how many times we run the production script.  For example, if in
+our `sim_production.conf` we set a simulation segment to run for 2 nanoseconds,
+and we set our runs to be 20, then the production script will be run 20 times,
+producing:
 
 20 x 2 ns = 40 ns
 
@@ -59,11 +56,12 @@ If we had set up say 40 simulation directories we would expect to generate
 
 40 x 2 ns = 160 ns
 
-As the production simulations run, a hidden counter in the simulation directory `.countdown.txt` keeps track
-of the progress. The simulation stops once this counter reaches 0.
+As the production simulations run, a hidden counter in the simulation directory
+`.countdown.txt` keeps track of the progress. The simulation stops once this
+counter reaches 0.
 
-If we like how our simulations ran and want to extend the simulation,
-perhaps run another 20 segments, we can do so by running:
+If we like how our simulations ran and want to extend the simulation, perhaps
+run another 20 segments, we can do so by running:
 
 ```sh
 ./initialize_new_round
@@ -73,18 +71,18 @@ This will reset the simulation and increment
 the round counter by 1. The next round will be a continuation of the
 previous simulation using the prior restart files.
 
-The directory structure also helps addresses the problem of group quota
-on the queuing system by running many smaller jobs rather than fewer longer
-jobs to get a desired simulation length. This approach can also help better
-utilise the machine resources as well as providing better protection against
-data corruption in case of hardware or simulation failures over the course
-of a long run. All trajectory data can be trivially consolidated into a single
-file on completion of the runs from the /Analysis folder.  Typically we try
-to keep job segments (or runs) finishing in 12 to 24 hours.
+The directory structure also helps addresses the problem of group quota on the
+queuing system by running many smaller jobs rather than fewer longer jobs to get
+a desired simulation length. This approach can also help better utilise the
+machine resources as well as providing better protection against data corruption
+in case of hardware or simulation failures over the course of a long run. All
+trajectory data can be trivially consolidated into a single file on completion
+of the runs from the /Analysis folder.  Typically we try to keep job segments
+(or runs) finishing in 12 to 24 hours.
 
 A basic workflow is described after the directory structure.
 
-### Directory Structure Map Overview:
+## Directory Structure
 
 ```sh
 |__Top_directory
@@ -116,11 +114,11 @@ A basic workflow is described after the directory structure.
 |__Project           --- For publication purposes
 |
 |___Manuscripts   - a space for writing and storing images
-|___MovieBox	 - a space for rendering movies
+|___MovieBox      - a space for rendering movies
 |___ProjectPlan   - A space to document and plan the project.
 ```
 
-### The general work flow:
+## The general work flow
 
 Before starting any new project it is always a good idea to make a plan with
 regards to the work and expected outcomes. For this we a simple text document
@@ -136,31 +134,38 @@ The basic workflow of this directory structure is described here.
 
 * The place to do this is under `/BUILD_DIR/`
 * Most topology and parameter files can be found under `/Parameters`
-* Once complete, place the relevant input files under `/InputFiles` and make sure you have the right parameter files under `/Parameters`
+* Once complete, place the relevant input files under `/InputFiles` and make
+  sure you have the right parameter files under `/Parameters`
 
-2. Prepare your input files.      `/Setup_and_Config`
+1. Prepare your input files.      `/Setup_and_Config`
 
-Under `/Setup_and_config` you can decide how many simulations to set up by editing the `master_config_file`. You can also run:
+Under `/Setup_and_config` you can decide how many simulations to set up by
+editing the `master_config_file`. You can also run:
 
 ```sh
 ./prerun_checkjob.sh
 ```
 
-to make sure you have things in place and calculate how much diskspace
-you might use. (note! This script only properly calculates the diskspace
-used properly when run from MERRI as the catdcd is for x86 architecture)
-A number of sbatch templates and example namd config files are stored
-here for you to modify for your specific job.  i.e.
-`sbatch_start` for setting up the equilibration step
+to make sure you have things in place and calculate how much diskspace you might
+use. (note! This script only properly calculates the diskspace used when run
+from MERRI as the catdcd is for x86 architecture). A number of sbatch templates
+and example namd config files are stored here for you to modify for your
+specific job. i.e.  `sbatch_start` for setting up the equilibration step
 `sim_opt.conf` the configuration file for the optimization step
-`sbatch_production` for the production runs
-`sim_production.conf` the configuration file for the production runs
+`sbatch_production` for the production runs `sim_production.conf` the
+configuration file for the production runs
 
-3. Benchmark your sims. `/Setup_and_Config/Benchmarking`
+1. Benchmark your sims. `/Setup_and_Config/Benchmarking`
 
-In order to check your jobs and optimize the numbers of cores used per simulation, make sure to go into `/Setup_and_Config/Benchmarking` Re-edit your sbatch files in `/Setup_and_Config` to use the appropriate numbers of CPUs. This is a really good time to not only benchmark your jobs to find an ideal node configuration but also a good chance to look at your simulation to check that it runs properly and that your model is sound. Nothing worse than running a lot of simulations to find that there is an error in the model!  
+In order to check your jobs and optimize the numbers of cores used per
+simulation, make sure to go into `/Setup_and_Config/Benchmarking` Re-edit your
+sbatch files in `/Setup_and_Config` to use the appropriate numbers of CPUs. This
+is a really good time to not only benchmark your jobs to find an ideal node
+configuration but also a good chance to look at your simulation to check that it
+runs properly and that your model is sound. Nothing worse than running a lot of
+simulations to find that there is an error in the model!
 
-4. Create and prepare job directories.
+1. Create and prepare job directories.
 
 From `/Setup_and_Config` use:
 
@@ -178,7 +183,7 @@ to fill these directories with input files. (You can also use this
 script to update the input files in the job directories while a production
 run is running.)
 
-5. Run/manage your jobs.          `/Top_directory`
+1. Run/manage your jobs.          `/Top_directory`
 
 From /Simulation use the script:
 
@@ -223,8 +228,8 @@ While the jobs are running you can check on their progress with:
 ```
 
 Notes on jobs as they are running:
-In each job directory there are a number of hidden files that are used to keep track
-of the system status. Users don't need to worry about them but they are:
+In each job directory there are a number of hidden files that are used to keep
+track of the system status. Users don't need to worry about them but they are:
 
 ```sh
 .countdown.txt       - file to countdown the runs of a particular simulation
@@ -236,12 +241,12 @@ of the system status. Users don't need to worry about them but they are:
 pausejob             - flag to stop jobs in event of something wrong.
 ```
 
-### Crash recovery:
+## Crash recovery
 
 In the event of a system crash, such as a power outage or hardware failure one
 can perform a recovery which restores your files to the last known good point.
-To do this, first make sure all your jobs are stopped,
-(try `./stop_all_jobs_immediately`) and then run the script:
+To do this, first make sure all your jobs are stopped, (try
+`./stop_all_jobs_immediately`) and then run the script:
 
 ```sh
 ./recover_and_cleanup_all_crashed_jobs.sh
@@ -251,7 +256,7 @@ This should take you into each directory to manually inspect the outputfiles
 where you can declare the last good outputfile. The script will then scrub
 subsequent "bad" output and restore data from the last "good" simulation.
 
-For example, when one runs the script after a crash in the OutputFiles/ you
+For example, when one runs the script after a crash in the `OutputFiles/` you
 might see:
 
 ```sh
@@ -265,16 +270,14 @@ might see:
 ```
 
 Looking at the size of the files we notice that job:
-`2012-09-06-17.57.calmodulin_run2_.5.dcd`
+`2012-09-06-17.57.calmodulin_run2_.5.dcd` has a file size of $$ 3789024 $$ where
+preceding files sizes are the same at $$ 21931876 $$ As we expect the files
+sizes to be almost identical in size, we can assume that something when wrong at
+that step. Therefore the last "good" file is:
+`2012-09-06-17.52.calmodulin_run2_.6.dcd`, which we enter when prompted. (cut
+and paste works well here.)
 
-has a file size of $$ 3789024 $$ where preceding files sizes are the same at
-$$ 21931876 $$ As we expect the files sizes to be almost identical in size, we can
-assume that something when wrong at that step. Therefore the last "good" file is:
-`2012-09-06-17.52.calmodulin_run2_.6.dcd`
-
-...which we enter when prompted. (cut and paste works well here.)
-
-Be careful to pick the last good file,  - data after that point will be removed
+Be careful to pick the last good file --- data after that point will be removed
 and the last good restart files retrieved ready to restart the simulations from
 that point onwards.
 
@@ -296,16 +299,15 @@ start again you may do so from the directory `/Setup_and_Config/` using:
 
 ***CAREFUL***, this will do what it says!
 
-6. Analyze your results.     `/Analysis`
+1. Analyse your results.     `/Analysis`
 
 Once all your jobs are done, you can go into this directory and pool all the
-simulation data from all the directories and run some basic analysis as well
-as ligand and protein backbone clustering.
-This can also help make the files more manageable by creating a subset of data
-where all the water and hydrogens are removed.
-Be sure to look at the README there!
+simulation data from all the directories and run some basic analysis as well as
+ligand and protein backbone clustering.  This can also help make the files more
+manageable by creating a subset of data where all the water and hydrogens are
+removed.  Be sure to look at the README there!
 
-7.  Writeup, make movies.    `/Project/`
+1.  Writeup, make movies.    `/Project/`
 
-The /Project directory is all about writing up the associated manuscript
-and making any illustrations or movies from the simulation files.
+The /Project directory is all about writing up the associated manuscript and
+making any illustrations or movies from the simulation files.
