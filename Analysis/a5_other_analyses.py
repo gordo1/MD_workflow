@@ -16,10 +16,8 @@ import argparse
 import subprocess
 import shutil
 from glob import glob
-import matplotlib
-matplotlib.use('Agg')  # For non-interactive backends
 
-# Matplotlib formatting bits
+# Pyplot formatting bits
 
 
 def init_plotting():
@@ -50,10 +48,9 @@ init_plotting()
 # }}}
 
 # Argparse
-# Convenient argument manager for python scripts
-# Optional arguments (should) have sane defaults
-# Allows for choice of rmsf, rmsd, sasa, secondary structure, residue-based
-# sasa, etc analysis.
+# Convenient argument manager for python scripts. Optional arguments (should)
+# have sane defaults. Allows for choice of rmsf, rmsd, sasa, secondary
+# structure, residue-based sasa, etc analyses.
 
 
 class MyParser(argparse.ArgumentParser):
@@ -63,43 +60,62 @@ class MyParser(argparse.ArgumentParser):
                 sys.exit(2)
 
 parser = MyParser(
-    description="Batch analysis script. Takes output from a2 and allows for \
-                    interpretation of RMSD, RMSF, SASA, secondary structure \
-                    and more.",
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument(
-    '-v', '--verbose',  action="store_true", help="Increase verbosity")
-parser.add_argument(
-    '--rmsd',  action="store_true", default=False, help="RMSD")
-parser.add_argument(
-    '-s', '--selection', default='protein',
-    help="""
-    Protein selection to use in analyses. Must be a valid selection.
-    At present, there are no explicit checks for making sure what you pass
-    is valid. Very fragile!
-    """)
-parser.add_argument(
-    '-as', '--align_sel', default='protein and name CA', help="""
-    Optional selection to use for protein alignment, if applicable. Currently
-    there are no sanity checks for this, so assume that it is very fragile.
-    Syntax documentation for VMD selections can be found here:
-    ks.uiuc.edu/Research/vmd/vmd-1.2/ug/vmdug_node137.html
-    """)
-
-parser.add_argument(
-    '--rmsf', action="store_true", default=False,
-    help="""
-    RMSF
-    """)
+        description="""
+                    Batch analysis script. Takes output from a2 and allows for
+                    interpretation of RMSD, RMSF, SASA, secondary structure and
+                    more.
+                    """,
+                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-v', '--verbose',  action="store_true",
+                    help="Increase verbosity")
+parser.add_argument('--rmsd',  action="store_true", default=False,
+                    help="""
+                    Calculate and plot root-mean squared deviation of selection
+                    backbone over the time course of the simulation. Useful for
+                    measuring structure equilibration.
+                    """)
+parser.add_argument('-s', '--selection', default='protein',
+                    help="""
+                    Protein selection to use in analyses. Must be a valid
+                    selection. At present, there are no explicit checks for
+                    making sure what you pass is valid. Very fragile!
+                    """)
+parser.add_argument('-as', '--align_sel', default='protein and name CA',
+                    help="""
+                    Optional selection to use for protein alignment, if
+                    applicable. Currently there are no sanity checks for this,
+                    so assume that it is very fragile.  Syntax documentation
+                    for VMD selections can be found here:
+                    ks.uiuc.edu/Research/vmd/vmd-1.2/ug/vmdug_node137.html
+                    """)
+parser.add_argument('--rmsf', action="store_true", default=False,
+                    help="""
+                    RMSF
+                    """)
 parser.add_argument('--sasa',  action="store_true", default=False,
-                    help="SASA")
+                    help="""
+                    Calculate and plot solvent-accessible surface area (SASA)
+                    of selection over the time course of the trajectory. Useful
+                    for measuring changes in protein interfaces.
+                    Computationally intensive.
+                    """)
 parser.add_argument('--rsasa',  action="store_true", default=False,
-                    help="Residue-level SASA")
+                    help="""
+                    Residue-level SASA.
+                    """)
 parser.add_argument('--rg',  action="store_true", default=False,
-                    help="Rg")
+                    help="""
+                    Calculate and plot radius of gyration of selection over the
+                    time course of the trajectory. Useful for measuring
+                    structural changes
+                    """)
 parser.add_argument('--dccm',  action="store_true", default=False,
-                    help="dccm")
+                    help="""
+                    Calculate and plot dynamic cross-correlation matrices
+                    (DCCMs) for each trajectory. Useful for measuring
+                    interaction networks within a structure (both positive and
+                    negative).
+                    """)
 parser.add_argument('--ss',  action="store_true", default=False,
                     help="""
                     Secondary structure scan using Stride.
@@ -179,88 +195,84 @@ def make_dir(dir):
 
 
 def command_catch_error(command):
+    """
+    Wrapper for shell commands. Stdin/stdout returned.
+    """
+    try:
+        p = subprocess.Popen(command, shell=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT)
+        p.wait()
+        return p.communicate()
+    except OSError as e:
         """
-        Wrapper for shell commands. Stdin/stdout returned.
+        If this fails, report the error.
         """
-        try:
-                p = subprocess.Popen(command, shell=True,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT)
-                p.wait()
-                return p.communicate()
-        except OSError as e:
-                """
-                If this fails, report the error.
-                """
-                logging.error(e)
-                logging.error("Command {com} failed. Please troubleshoot this and try \
-                                again")
-                sys.exit()
+        logging.error(e)
+        logging.error("Command {com} failed. Please troubleshoot this and try \
+                again")
+        sys.exit()
 
 
 def get_dirs(dirlist):
-        i_list = []
-        with open(dirlist) as f:
-                for line in f:
-                        line = line.rstrip('\n')
-                        i = subprocess.check_output(
-                                "echo {0} | sed 's/.*_//' | sed 's/\.*//'\
-                                                ".format(line),
-                                shell=True)
-                        i = i.replace('\n', '')
-                        i_list.append(i)
-        return i_list
+    i_list = []
+    with open(dirlist) as f:
+        for line in f:
+            line = line.rstrip('\n')
+            i = subprocess.check_output(
+                    "echo {0} | sed 's/.*_//' | sed 's/\.*//'".format(line),
+                    shell=True)
+            i = i.replace('\n', '')
+            i_list.append(i)
+    return i_list
 
 
 def basic_plot(proc):
-        if os.path.isfile(proc['fname']):
-                data = np.loadtxt(proc['fname'])
-                plt.subplot(111)
-                plt.xlabel(proc['xlabel'])
-                plt.ylabel(proc['ylabel'])
-                plt.plot(data[:, 0]/10, data[:, 1, ], lw=2)
-                plt.ylim(proc['ymin'])
-                plt.savefig('{ofile}.pdf'.format(ofile=proc['ofile']))
-                plt.close()
+    if os.path.isfile(proc['fname']):
+        data = np.loadtxt(proc['fname'])
+        plt.subplot(111)
+        plt.xlabel(proc['xlabel'])
+        plt.ylabel(proc['ylabel'])
+        plt.plot(data[:, 0]/10, data[:, 1, ], lw=2)
+        plt.ylim(proc['ymin'])
+        plt.savefig('{ofile}.pdf'.format(ofile=proc['ofile']))
+        plt.close()
 
 
 def rmsf_shared_axis(d):
-        if glob('{fn}*'.format(fn=d['fname'])):
-                a = [i for i in sorted(glob('{fn}*'.format(fn=d['fname'])))]
-                n = len(a)
-                count = 1
-                color = iter(plt.cm.Blues(np.linspace(0, 1, n)))
-                for f in a:
-                        if os.path.isfile(f):
-                                c = next(color)
-                                o = os.path.splitext(f)[0]
-                                data = np.loadtxt('{o}.txt'.format(o=o))
-                                path, prefix = os.path.split(
-                                                '{o}.txt'.format(o=o))
-                                ax = plt.subplot(111)
-                                plt.plot(data[:, 0], data[:, 1, ], c=c,
-                                         label='Fraction {count} of 5'.format(
-                                                 count=count))
-                                count = count+1
-                if glob('{fn}*'.format(fn=d['all_avg'])):
-                        if os.path.isfile(f):
-                                o = os.path.splitext(f)[0]
-                                data = np.loadtxt('{o}.txt'.format(o=o))
-                                path, prefix = os.path.split('{oprefix}.txt\
-                                                '.format(oprefix=o))
-                                ax = plt.subplot(111)
-                                plt.plot(data[:, 0], data[:, 1, ], c='r',
-                                         label='All')
-                legend = ax.legend(loc='upper left')
-                for label in legend.get_texts():
-                        label.set_fontsize('small')
-                for label in legend.get_lines():
-                        label.set_linewidth(1)
-                plt.xlabel('{label}'.format(label=d['xlabel']))
-                plt.ylabel('{label}'.format(label=d['ylabel']))
-                plt.ylim(d['ymin'], d['ymax'])
-                plt.savefig('{oprefix}/rmsf.pdf'.format(oprefix=out_d))
-                plt.close()
+    if glob('{fn}*'.format(fn=d['fname'])):
+        a = [i for i in sorted(glob('{fn}*'.format(fn=d['fname'])))]
+        n = len(a)
+        count = 1
+        color = iter(plt.cm.Blues(np.linspace(0, 1, n)))
+        for f in a:
+            if os.path.isfile(f):
+                c = next(color)
+                o = os.path.splitext(f)[0]
+                data = np.loadtxt('{o}.txt'.format(o=o))
+                path, prefix = os.path.split(
+                    '{o}.txt'.format(o=o))
+                ax = plt.subplot(111)
+                plt.plot(data[:, 0], data[:, 1, ], c=c,
+                         label='Fraction {count} of 5'.format(count=count))
+                count = count+1
+    if glob('{fn}*'.format(fn=d['all_avg'])):
+        if os.path.isfile(f):
+            o = os.path.splitext(f)[0]
+            data = np.loadtxt('{o}.txt'.format(o=o))
+            path, prefix = os.path.split('{oprefix}.txt'.format(oprefix=o))
+            ax = plt.subplot(111)
+            plt.plot(data[:, 0], data[:, 1, ], c='r', label='All')
+            legend = ax.legend(loc='upper left')
+    for label in legend.get_texts():
+        label.set_fontsize('small')
+    for label in legend.get_lines():
+        label.set_linewidth(1)
+    plt.xlabel('{label}'.format(label=d['xlabel']))
+    plt.ylabel('{label}'.format(label=d['ylabel']))
+    plt.ylim(d['ymin'], d['ymax'])
+    plt.savefig('{oprefix}/rmsf.pdf'.format(oprefix=out_d))
+    plt.close()
 
 # }}}
 
@@ -301,146 +313,134 @@ i_list = get_dirs(dir_list)
 
 # Checks
 for f in [dir_list]:
-        check_file(f)
+    check_file(f)
 for dir in [raw, processed]:
-        logging.info(dir)
-        make_dir(dir)
-        for replicate in i_list:
-                d = "{0}/sim_{1}".format(dir, replicate)
-                make_dir(d)
+    logging.info(dir)
+    make_dir(dir)
+    for replicate in i_list:
+        d = "{0}/sim_{1}".format(dir, replicate)
+        make_dir(d)
 
 for r, a in res.iteritems():
-        if r is True:
-                for replicate in i_list:
-                        c = command_catch_error(
-                                        '{vmd} -e {script} -args \
-                                                        no_water_{rep}.dcd \
-                                                        {raw} {align_sel}\
-                                                        '.format(
-                                                vmd=vmd_cmd,
-                                                script=a,
-                                                rep=replicate,
-                                                raw=raw,
+    if r is True:
+        for replicate in i_list:
+            c = command_catch_error(
+                    '{vmd} -e {script} -args no_water_{rep}.dcd {raw} \
+                            {align_sel}'.format(vmd=vmd_cmd, script=a,
+                                                rep=replicate, raw=raw,
                                                 align_sel=result.align_sel))
 
 for replicate in i_list:
-        out_d = "{0}/sim_{1}".format(processed, replicate)
-        try:
-                rg_dict = {
-                                'fname': '{0}/sim_{1}/\
-                                                protein_radius_gyration_{1}.txt\
-                                                '.format(raw, replicate),
-                                'xlabel': 'Simulation time (ns)',
-                                'ylabel': 'R$_g$ ($\AA$)',
-                                'ymin': 0,
-                                'ofile': '{0}/rg_plot_{1}\
-                                                '.format(out_d, replicate)}
-                rmsd_dict = {
-                                'fname':
-                                '{0}/sim_{1}/rmsd_protein_{1}.txt\
-                                                '.format(raw, replicate),
-                                'xlabel': 'Simulation time (ns)',
-                                'ylabel': 'RMSD ($\AA$)',
-                                'ymin': 0,
-                                'ofile': '{0}/rmsd_plot_{1}\
-                                                '.format(out_d, replicate)}
-                rmsf_dict = {
-                                'fname': '{0}/sim_{1}/rmsf_protein_backbone\
-                                                '.format(raw, replicate),
-                                'all_avg':
-                                '{0}/sim_{1}/rmsf_all_protein_backbone\
-                                                '.format(raw, replicate),
-                                'xlabel': 'Residue No.',
-                                'ylabel': 'RMSF ($\AA$)',
-                                'ymin': 0,
-                                'ymax': 10,
-                                'ofile': '{0}/rmsf_plot_{1}\
-                                                '.format(out_d, replicate)}
-                sasa_dict = {
-                                'fname': '{0}/sim_{1}/protein_sasa_{1}.txt\
-                                                '.format(raw, replicate),
-                                'xlabel': 'Simulation time (ns)',
-                                'ylabel': 'Solvent-accessible surface area\
-                                                ($\AA^2$)',
-                                'ymin': 0,
-                                'ofile': '{0}/sasa_plot_{1}'.format(
-                                        out_d, replicate)}
-                rsasa_dict = {
-                                'fname': '{0}/sim_{1}/protein_sasa_{1}.txt\
-                                                '.format(raw, replicate),
-                                'xlabel': 'Simulation time (ns)',
-                                'ylabel': 'Solvent-accessible surface area \
-                                                ($\AA^2$)',
-                                'ymin': 0,
-                                'ofile': '{0}/sasa_plot_{1}'.format(
-                                        out_d, replicate)}
-                ss_dict = {
-                                'fname_helix': '{0}/sim_{1}/SecondaryStructure\
-                                                /helixPercent.plt'.format(
-                                                        raw, replicate),
-                                'fname_beta': '{0}/sim_{1}/SecondaryStructure\
-                                                /betaPercent.plt'.format(
-                                                        raw, replicate),
-                                'fname_coil':
-                                '{0}/sim_{1}/SecondaryStructure/\
-                                                coilPercent.plt'.format(
-                                                        raw, replicate),
-                                'fname_turn':
-                                '{0}/sim_{1}/SecondaryStructure\
-                                                /turnPercent.plt'.format(
-                                                        raw, replicate),
-                                'xlabel': 'Simulation time (ns)',
-                                'ylabel': 'Proportion Secondary Structure',
-                                'ymin': 0,
-                                'ofile': '{0}/ss_plot_{1}'.format(
-                                        out_d, replicate)}
+    out_d = "{0}/sim_{1}".format(processed, replicate)
+    try:
+        rg_dict = {
+                'fname': '{0}/sim_{1}/protein_radius_gyration_{1}.txt'.format(
+                    raw, replicate),
+                'xlabel': 'Simulation time (ns)',
+                'ylabel': 'R$_g$ ($\AA$)',
+                'ymin': 0,
+                'ofile': '{0}/rg_plot_{1}'.format(out_d, replicate)
+                }
+        rmsd_dict = {
+                'fname':
+                '{0}/sim_{1}/rmsd_protein_{1}.txt'.format(raw, replicate),
+                'xlabel': 'Simulation time (ns)',
+                'ylabel': 'RMSD ($\AA$)',
+                'ymin': 0,
+                'ofile': '{0}/rmsd_plot_{1}'.format(out_d, replicate)
+                }
 
-                for dict in [ss_dict]:
-                        """
-                        Making an assumption here that if the helix file
-                        exists, the others do as well. This is very fragile and
-                        could easily be improved, but I don't care enough right
-                        now
-                        """
-                        if os.path.isfile(dict['fname_helix']):
-                                data_h = np.loadtxt(dict['fname_helix'])
-                                data_b = np.loadtxt(dict['fname_beta'])
-                                data_c = np.loadtxt(dict['fname_coil'])
-                                data_t = np.loadtxt(dict['fname_turn'])
-                                # Row-wise read in ss elements into array ss
-                                ss = np.row_stack([data_h, data_b, data_c,
-                                                   data_t])
-                                # Dummy Y-data for plotting
-                                y = np.arange(len(ss[1]))
-                                # Use more appropriate RGBY colour palette
-                                ax = plt.subplot(111)
-                                plt.xlabel('{label}'.format(
-                                        label=dict['xlabel']))
-                                plt.ylabel('{label}'.format(
-                                        label=dict['ylabel']))
-                                plt.stackplot(y, ss, lw=0.1, alpha=0.7)
-                                # Hack to give labels for ss elements
-                                plt.plot([], [], color='r', alpha=0.5,
-                                         w=10, label='helix')
-                                plt.plot([], [], color='b', alpha=0.7,
-                                         linewidth=10, label='coil')
-                                plt.plot([], [], color='y', alpha=0.7,
-                                         linewidth=10, label='turn')
-                                plt.plot([], [], color='g', alpha=0.7,
-                                         linewidth=10, label='strand')
-                                # Y limits
-                                plt.ylim(dict['ymin'])
-                                # Write the file out
-                                plt.savefig('{0}.pdf'.format(dict['ofile']))
-                                plt.close()
+        rmsf_dict = {
+                'fname': '{0}/sim_{1}/rmsf_protein_backbone'.format(
+                    raw, replicate),
+                'all_avg':
+                '{0}/sim_{1}/rmsf_all_protein_backbone'.format(
+                    raw, replicate),
+                'xlabel': 'Residue No.',
+                'ylabel': 'RMSF ($\AA$)',
+                'ymin': 0,
+                'ymax': 10,
+                'ofile': '{0}/rmsf_plot_{1}'.format(out_d, replicate)
+                }
+        sasa_dict = {
+                'fname': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(
+                    raw, replicate),
+                'xlabel': 'Simulation time (ns)',
+                'ylabel': 'Solvent-accessible surface area ($\AA^2$)',
+                'ymin': 0,
+                'ofile': '{0}/sasa_plot_{1}'.format(out_d, replicate)
+                }
+        rsasa_dict = {
+                'fname': '{0}/sim_{1}/protein_sasa_{1}.txt'.format(
+                    raw, replicate),
+                'xlabel': 'Simulation time (ns)',
+                'ylabel': 'Solvent-accessible surface area ($\AA^2$)',
+                'ymin': 0,
+                'ofile': '{0}/sasa_plot_{1}'.format(out_d, replicate)
+                }
+        ss_dict = {
+                'fname_helix':
+                '{0}/sim_{1}/SecondaryStructure/helixPercent.plt'.format(
+                    raw, replicate),
+                'fname_beta':
+                '{0}/sim_{1}/SecondaryStructure/betaPercent.plt'.format(
+                    raw, replicate),
+                'fname_coil':
+                '{0}/sim_{1}/SecondaryStructure/coilPercent.plt'.format(
+                    raw, replicate),
+                'fname_turn':
+                '{0}/sim_{1}/SecondaryStructure/turnPercent.plt'.format(
+                    raw, replicate),
+                'xlabel': 'Simulation time (ns)',
+                'ylabel': 'Proportion Secondary Structure',
+                'ymin': 0,
+                'ofile': '{0}/ss_plot_{1}'.format(out_d, replicate)
+                }
 
-                # If true, plot rmsd, sasa, and radius of gyrations data
-                for p in [rmsd_dict, sasa_dict, rg_dict]:
-                        basic_plot(p)
+        for dict in [ss_dict]:
+            """
+            Making an assumption here that if the helix file
+            exists, the others do as well. This is very fragile and
+            could easily be improved, but I don't care enough right
+            now
+            """
+            if os.path.isfile(dict['fname_helix']):
+                data_h = np.loadtxt(dict['fname_helix'])
+                data_b = np.loadtxt(dict['fname_beta'])
+                data_c = np.loadtxt(dict['fname_coil'])
+                data_t = np.loadtxt(dict['fname_turn'])
+                # Row-wise read in ss elements into array ss
+                ss = np.row_stack([data_h, data_b, data_c, data_t])
+                # Dummy Y-data for plotting
+                y = np.arange(len(ss[1]))
+                # Use more appropriate RGBY colour palette
+                ax = plt.subplot(111)
+                plt.xlabel('{label}'.format(
+                    label=dict['xlabel']))
+                plt.ylabel('{label}'.format(
+                    label=dict['ylabel']))
+                plt.stackplot(y, ss, lw=0.1, alpha=0.7)
+                # Hack to give labels for ss elements
+                plt.plot([], [], color='r', alpha=0.5,
+                         w=10, label='helix')
+                plt.plot([], [], color='b', alpha=0.7,
+                         linewidth=10, label='coil')
+                plt.plot([], [], color='y', alpha=0.7,
+                         linewidth=10, label='turn')
+                plt.plot([], [], color='g', alpha=0.7,
+                         linewidth=10, label='strand')
+                # Y limits
+                plt.ylim(dict['ymin'])
+                # Write the file out
+                plt.savefig('{0}.pdf'.format(dict['ofile']))
+                plt.close()
 
-                # For each replicate, plot fractional rmsf values and total
-                # rmsf values
-                rmsf_shared_axis(rmsf_dict)
+        # If true, plot rmsd, sasa, and radius of gyrations data
+        for p in [rmsd_dict, sasa_dict, rg_dict]:
+            basic_plot(p)
 
-        except OSError as e:
-                logging.error(e)
+        # For each replicate, plot fractional rmsf values and total rmsf values
+        rmsf_shared_axis(rmsf_dict)
+
+    except OSError as e:
+        logging.error(e)
