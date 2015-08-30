@@ -4,7 +4,7 @@
 # ROLE:     TODO (some explanation)
 # CREATED:  2014-06-03 21:34:19
 
-# write_vector --------------------------------------------------------------- {{{
+# write_vector ------------------------------------------------------------ {{{
 
 proc write_vector { vec filename } {
   set fid [open $filename a]
@@ -13,7 +13,7 @@ proc write_vector { vec filename } {
 }
 
 # }}}
-# saltbrscan ----------------------------------------------------------------- {{{
+# saltbrscan -------------------------------------------------------------- {{{
 
 proc saltbrscan { start end sel outdir } {
   if { [ file isdirectory $outdir ] == 1 } {
@@ -26,7 +26,7 @@ proc saltbrscan { start end sel outdir } {
 }
 
 # }}}
-# sasa_scan ------------------------------------------------------------------ {{{
+# sasa_scan --------------------------------------------------------------- {{{
  
 proc sasa_scan { seltext outfile incr } {
   set sel [ atomselect top "$seltext" ]
@@ -40,7 +40,7 @@ proc sasa_scan { seltext outfile incr } {
 }
 
 # }}}
-# sasa_scan_bigdcd ----------------------------------------------------------- {{{
+# sasa_scan_bigdcd -------------------------------------------------------- {{{
 
 proc sasa_scan_bigdcd { frame } {
   global sel_protein
@@ -68,7 +68,7 @@ proc sasa_resid_scan_bigdcd { frame } {
 }
 
 # }}}
-# trajscan ------------------------------------------------------------------- {{{
+# trajscan ---------------------------------------------------------------- {{{
 
 # Go through each frame of the trajectory
 # Output a lot of information
@@ -111,7 +111,7 @@ proc trajscan {a b {r 2.0}} {
 }
 
 # }}} 
-# trajscanstat --------------------------------------------------------------- {{{
+# trajscanstat ------------------------------------------------------------ {{{
 #
 # As above, but just return minimal information on the number of
 # frames where close fits are found.
@@ -136,7 +136,7 @@ puts "============================================="
 }
 
 # }}} 
-# trajscanstatm -------------------------------------------------------------- {{{
+# trajscanstatm ----------------------------------------------------------- {{{
 # As trajscanstat, but a list of protein atom selections is passed in.
 # If all atomselections are found to be true, the frame is counted.
 proc trajscanstatm {alist b {r 2.0}} {
@@ -170,7 +170,7 @@ puts "============================================="
 return $hitlist
 }
 # }}} 
-# mbondscan ------------------------------------------------------------------ {{{
+# mbondscan --------------------------------------------------------------- {{{
 
 # Go through each frame of a trajectory and output the vector
 # connecting the center of mass of two atom selections and the length
@@ -204,7 +204,7 @@ molinfo top set frame $oldframe
 }
 
 # }}} 
-# inertiascan ---------------------------------------------------------------- {{{
+# inertiascan ------------------------------------------------------------- {{{
 
 proc inertiascan {a b fnamedist fnameangle } {
   set oldframe [molinfo top get frame]
@@ -229,7 +229,7 @@ molinfo top set frame $oldframe
 }
 
 # }}} 
-# anglescan ------------------------------------------------------------------ {{{
+# anglescan --------------------------------------------------------------- {{{
 
 # Go through each frame of a trajectory and output the angle between
 # the center-of-mass of the three atomselections: a,b & c.  If a file
@@ -269,7 +269,7 @@ molinfo top set frame $oldframe
 }
 
 # }}} 
-# rgyrscan ------------------------------------------------------------------- {{{
+# rgyrscan ---------------------------------------------------------------- {{{
 
 # Go through each frame of a trajectory and calculate the radius of
 # gyration of the input atomselection. If a filename is given, write
@@ -299,7 +299,7 @@ molinfo top set frame $oldframe
 }
 
 # }}}
-# rgyrscan_bigdcd ------------------------------------------------------------ {{{
+# rgyrscan_bigdcd --------------------------------------------------------- {{{
 
 # Go through each frame of a trajectory and calculate the radius of
 # gyration of the input atomselection. If a filename is given, write
@@ -314,7 +314,7 @@ proc rgyrscan_bigdcd { frame } {
 }
 
 # }}}
-# dihedralscan --------------------------------------------------------------- {{{
+# dihedralscan ------------------------------------------------------------ {{{
 
 # Go through each frame of a trajectory and output the dihedral angle between
 # the center-of-mass of the four atomselections: a,b, c &d.  If a file
@@ -359,7 +359,31 @@ molinfo top set frame $oldframe
 }
 
 # }}}
-# reduced -------------------------------------------------------------------- {{{
+# phiscan_bigdcd ---------------------------------------------------------- {{{
+
+proc phi_bigdcd { frame } {
+  global sel_CA
+  set f [ open "phi.txt" a ]
+  set dihedral_long [ $sel_CA get {phi} ]
+  foreach dh $dihedral_long { lappend dihedral [format "%.2f" $dh] }
+  puts $f "$frame $dihedral"
+  close $f
+}
+
+# }}}
+# psiscan_bigdcd ---------------------------------------------------------- {{{
+
+proc psi_bigdcd { frame } {
+  global sel_CA
+  set f [ open "phi.txt" a ]
+  set dihedral_long [ $sel_CA get {psi} ]
+  foreach dh $dihedral_long { lappend dihedral [format "%.2f" $dh] }
+  puts $f "$frame $dihedral"
+  close $f
+}
+
+# }}}
+# reduced ----------------------------------------------------------------- {{{
 
 # Write the indexes for the selection, sel, to a file fname.text and
 # also write a corresponding psf file fname.psf
@@ -372,7 +396,7 @@ proc reduced { sel fname} {
 }
 
 # }}}
-# get_charge ----------------------------------------------------------------- {{{
+# get_charge -------------------------------------------------------------- {{{
 
 # get the total charge of an atomselection
 proc get_charge {sel} {
@@ -380,7 +404,7 @@ proc get_charge {sel} {
 }
 
 # }}} 
-# fitframes ------------------------------------------------------------------ {{{
+# fitframes --------------------------------------------------------------- {{{
 
 ## This takes a selection and fits that selection for every frame in the
 ## molecule (all atoms are moved, but the fit is based on the selection).
@@ -406,7 +430,7 @@ proc fitframes { molid seltext } {
 }
 
 # }}}
-# fitagainst ----------------------------------------------------------------- {{{
+# fitagainst -------------------------------------------------------------- {{{
 
 proc fitagainst { molid0 molid1 seltext } {
   set ref [atomselect $molid0 $seltext frame 0]
@@ -423,7 +447,7 @@ return
 }
 
 # }}}
-# mark_beta ------------------------------------------------------------------ {{{
+# mark_beta --------------------------------------------------------------- {{{
 
 # for the given molid mark the beta column for the selection text to 1
 proc mark_beta { molid seltext } {
@@ -434,7 +458,7 @@ proc mark_beta { molid seltext } {
 }
 
 # }}}
-# write_seq ------------------------------------------------------------------ {{{
+# write_seq --------------------------------------------------------------- {{{
 #
 # write the sequence of the selection to fname, one line per residue
 proc write_seq { molid seltext fname } {
@@ -452,7 +476,7 @@ proc write_seq { molid seltext fname } {
 close $f
 }
 # }}} 
-# rmsdscan ------------------------------------------------------------------- {{{
+# rmsdscan ---------------------------------------------------------------- {{{
 
 # trajectory rmsd scan to file
 proc rmsdscan { sel mol } {
@@ -472,7 +496,7 @@ close $f
 }
 
 # }}} 
-# rmsdscan_bigdcd ------------------------------------------------------------ {{{
+# rmsdscan_bigdcd --------------------------------------------------------- {{{
 
 proc rmsdscan_bigdcd { frame } {
   global reference_CA sel_CA sel_protein
@@ -484,7 +508,7 @@ proc rmsdscan_bigdcd { frame } {
 }
 
 # }}}
-# rmsfscan ------------------------------------------------------------------- {{{
+# rmsfscan ---------------------------------------------------------------- {{{
 
 # per residue rmsf to file
 proc rmsfscan { sel fname } {
@@ -500,7 +524,7 @@ proc rmsfscan { sel fname } {
 }
 
 # }}}
-# rmsfscan_range ------------------------------------------------------------- {{{
+# rmsfscan_range ---------------------------------------------------------- {{{
 
 # per residue rmsf to file
 proc rmsfscan_range { sel start_frame end_frame fname } {
@@ -516,14 +540,14 @@ proc rmsfscan_range { sel start_frame end_frame fname } {
 }
 
 # }}}
-# switch_on_tube_scaling ----------------------------------------------------- {{{
+# switch_on_tube_scaling -------------------------------------------------- {{{
 
 proc switch_on_tube_scaling { {field beta}} {
   set env(VMDMODULATERIBBON) $field
 }
 
 # }}} 
-# split_chain_fragments ------------------------------------------------------ {{{
+# split_chain_fragments --------------------------------------------------- {{{
 
 # splits molecule into multiple fragments indexed by chain and fragment id
 proc split_chain_fragments { mol } {
@@ -541,7 +565,7 @@ proc split_chain_fragments { mol } {
 }
 
 # }}}
-# apply_beta_from_file ------------------------------------------------------- {{{
+# apply_beta_from_file ---------------------------------------------------- {{{
 
 # reads a two column: <resid> <data>
 # file and applies <data> to molid
@@ -563,7 +587,7 @@ proc apply_beta_from_file {fname molid} {
 }
 
 # }}}
-# twitch_reps ---------------------------------------------------------------- {{{
+# twitch_reps ------------------------------------------------------------- {{{
 
 # work on the assumption that there is only one representation for
 # molid
@@ -578,7 +602,7 @@ proc twitch_reps {molid} {
 }
 
 # }}}
-# outputcheck ---------------------------------------------------------------- {{{
+# outputcheck ------------------------------------------------------------- {{{
 
 # basic conditional filecheck
 proc outputcheck { filename } {
@@ -593,7 +617,7 @@ proc outputcheck { filename } {
 }
 
 # }}} 
-# ss_calc_bigdcd ------------------------------------------------------------- {{{
+# ss_calc_bigdcd ---------------------------------------------------------- {{{
 
 # Secondary structure scan across a trajectory
 # Loads trajectory frame-by-frame using bigdcd
@@ -630,7 +654,7 @@ proc ss_calc_bigdcd { frame } {
 }
 
 # }}}
-# ss_calc -------------------------------------------------------------------- {{{
+# ss_calc ----------------------------------------------------------------- {{{
 
 # Secondary structure scan across a trajectory
 proc ss_calc { molid start end stride } { ;# ../Scripts/Tcl_Scripts/analysis.tcl
