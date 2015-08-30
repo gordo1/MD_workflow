@@ -5,12 +5,17 @@
 # CREATED:  2015-06-18 20:43:31
 # MODIFIED: 2015-07-12 10:59:46
 
-# LOAD USEFUL ANALYSIS SCRIPTS -------------------------------------------- {{{
+# BASIC USAGE 
 
-source ../Scripts/Tcl_Scripts/analysis.tcl
-source ../Scripts/Tcl_Scripts/bigdcd.tcl
-
-# }}}
+# Call this script from VMD using:
+#
+#   vmd -dispdev text -e <this-script.tcl> -args <traj-file> <out-dir> <sel>
+#
+# Where:
+#   <traj-file> is a single trajectory file (must exit-slash any spaces in the
+#   name)
+#   <out-dir> is the directory into which the output data file will be moved
+#   <sel> is an optional atom selection to be used for alignment
 
 # VARIABLES --------------------------------------------------------------- {{{
 
@@ -37,14 +42,12 @@ proc dircheck { dirname } {
 }
 
 
-
 proc filecheck { filename } {
   if { [ file exists $filename ] } {
     file delete -force $filename
     puts "Deleted $filename"
   }
 }
-
 
 
 proc dir_make { dir } {
@@ -55,6 +58,34 @@ proc dir_make { dir } {
   } else {
     file mkdir $dir
   }
+}
+
+
+proc rmsfscan { sel fname } {
+  # per residue rmsf to file
+  set rlist [$sel get resid]
+  set rmsf [measure rmsf $sel]
+  set s [lindex $rlist 0]
+  set n [lindex $rlist end]
+  set f [open $fname.txt "w"]
+  for {set i $s} {$i <= $n} {incr i} {
+    puts $f "$i [lindex $rmsf [expr $i - $s]]"
+  }
+  close $f
+}
+
+
+proc rmsfscan_range { sel start_frame end_frame fname } {
+  # per residue rmsf to file
+  set rlist [$sel get resid]
+  set rmsf [measure rmsf $sel first $start_frame last $end_frame ]
+  set s [lindex $rlist 0]
+  set n [lindex $rlist end]
+  set f [open $fname.txt "w"]
+  for {set i $s} {$i <= $n} {incr i} {
+    puts $f "$i [lindex $rmsf [expr $i - $s]]"
+  }
+  close $f
 }
 
 # }}}

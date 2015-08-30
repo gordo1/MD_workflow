@@ -1,9 +1,8 @@
 #!/usr/bin/env tclsh
 # AUTHOR:   Shane Gordon
-# FILE:     analysis_rsasa.tcl
+# FILE:     analysis_psi.tcl
 # ROLE:     TODO (some explanation)
-# CREATED:  2015-07-07 11:21:21
-# MODIFIED: 2015-07-26 16:34:19
+# CREATED:  2015-06-18 20:48:18
 
 # BASIC USAGE 
 
@@ -97,13 +96,6 @@ proc bigdcd_wait { } {
 
 # }}}
 
-# LOAD USEFUL ANALYSIS SCRIPTS -------------------------------------------- {{{
-
-source ../Scripts/Tcl_Scripts/analysis.tcl
-source ../Scripts/Tcl_Scripts/bigdcd.tcl
-
-# }}}
-
 # VARIABLES --------------------------------------------------------------- {{{
 
 set input_psf "no_water"
@@ -129,14 +121,12 @@ proc dircheck { dirname } {
 }
 
 
-
 proc filecheck { filename } {
   if { [ file exists $filename ] } {
     file delete -force $filename
     puts "Deleted $filename"
   }
 }
-
 
 
 proc dir_make { dir } {
@@ -149,21 +139,14 @@ proc dir_make { dir } {
   }
 }
 
-proc sasa_resid_scan_bigdcd { frame } {
-  # Per-residue sasa scan
-  global sel_protein 
-  set sel [ atomselect top "protein and $sel_protein and name CA" ]
-  set fd [ open "rsasa.txt" a ]
-  set rlist [ $sel get resid ]
-  set sasa ""
-  foreach r $rlist {
-    set r_sel [ atomselect top "protein and resid $r" ]
-    set r_sasa [ format %.2f [measure sasa 1.4 $r_sel] ]
-    append sasa "$r_sasa" ","
-    unset r_sasa
-  }
-  puts $fd $sasa
-  close $fd
+
+proc psi_bigdcd { frame } {
+  global sel_CA
+  set f [ open "psi.txt" a ]
+  set dihedral_long [ $sel_CA get {psi} ]
+  foreach dh $dihedral_long { lappend dihedral [format "%.2f" $dh] }
+  puts $f "$frame $dihedral"
+  close $f
 }
 
 # }}}
@@ -182,9 +165,9 @@ set sel_CA [ atomselect $mol $seltext_CA ]
 mol addfile $input_psf.pdb first 0 last 0 waitfor all
 
 # Time-dependent SASA-scan for entire simulation
-filecheck $out_dir/protein_sasa_$index_no.txt
-bigdcd sasa_scan_bigdcd $input
+filecheck $out_dir/phi.txt
+bigdcd psiscan_bigdcd $input
 bigdcd_wait
-file rename -force rsasa.txt $out_dir/rsasa_$index_no.txt
+file rename -force psi.txt $out_dir/psi.txt
 
 exit
