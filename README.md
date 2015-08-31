@@ -299,13 +299,26 @@ start again you may do so from the directory `/Setup_and_Config/` using:
 
 ***CAREFUL***, this will do what it says!
 
-1. Analyse your results.     `/Analysis`
+1. Analyse your results.
+   [github.com/s-gordon/analysis.git](https://github.com/s-gordon/analysis.git)
+
+This aspect of the directory structure has been moved to an independent
+repository:
+[github.com/s-gordon/analysis.git](https://github.com/s-gordon/analysis.git).
+Clone it using git with the following command:
+
+```sh
+git clone https://github.com/s-gordon/analysis.git <project-dir>/Analysis
+```
+
+For everything to work properly, it must be cloned with the top directory of
+`MD_workflow`.
 
 Once all your jobs are done, you can go into this directory and pool all the
 simulation data from all the directories and run some basic analysis as well as
 ligand and protein backbone clustering.  This can also help make the files more
 manageable by creating a subset of data where all the water and hydrogens are
-removed.  Be sure to look at the README there!
+removed. Be sure to look at the README there!
 
 1.  Writeup, make movies.    `/Project/`
 
