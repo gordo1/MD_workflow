@@ -130,14 +130,18 @@ original rationale! Do make sure to spend time planning your work.
 The basic workflow of this directory structure is described here.
 (There are more specific README files in each of the directories.)
 
-1. Build input models.    `/BUILD_DIR`
+### Build Input Models
+
+`/BUILD_DIR`
 
 * The place to do this is under `/BUILD_DIR/`
 * Most topology and parameter files can be found under `/Parameters`
 * Once complete, place the relevant input files under `/InputFiles` and make
   sure you have the right parameter files under `/Parameters`
 
-1. Prepare your input files.      `/Setup_and_Config`
+### Prepare Your Input Files
+
+`/Setup_and_Config`
 
 Under `/Setup_and_config` you can decide how many simulations to set up by
 editing the `master_config_file`. You can also run:
@@ -155,7 +159,9 @@ specific job. i.e.  `sbatch_start` for setting up the equilibration step
 `sbatch_production` for the production runs `sim_production.conf` the
 configuration file for the production runs
 
-1. Benchmark your sims. `/Setup_and_Config/Benchmarking`
+### Benchmark Your Sims
+
+`/Setup_and_Config/Benchmarking`
 
 In order to check your jobs and optimize the numbers of cores used per
 simulation, make sure to go into `/Setup_and_Config/Benchmarking` Re-edit your
@@ -165,7 +171,7 @@ configuration but also a good chance to look at your simulation to check that it
 runs properly and that your model is sound. Nothing worse than running a lot of
 simulations to find that there is an error in the model!
 
-1. Create and prepare job directories.
+### Create And Prepare Job Directories
 
 From `/Setup_and_Config` use:
 
@@ -183,7 +189,9 @@ to fill these directories with input files. (You can also use this
 script to update the input files in the job directories while a production
 run is running.)
 
-1. Run/manage your jobs.          `/Top_directory`
+### Run/Manage Your Jobs
+
+`/Top_directory`
 
 From /Simulation use the script:
 
@@ -240,6 +248,33 @@ track of the system status. Users don't need to worry about them but they are:
 
 pausejob             - flag to stop jobs in event of something wrong.
 ```
+
+### Analyse Your Results
+
+This aspect of the directory structure has been moved to an independent
+repository:
+[github.com/s-gordon/analysis.git](https://github.com/s-gordon/analysis.git).
+Clone it using git with the following command:
+
+```sh
+git clone https://github.com/s-gordon/analysis.git <project-dir>/Analysis
+```
+
+For everything to work properly, it must be cloned with the top directory of
+`MD_workflow`.
+
+Once all your jobs are done, you can go into this directory and pool all the
+simulation data from all the directories and run some basic analysis as well as
+ligand and protein backbone clustering.  This can also help make the files more
+manageable by creating a subset of data where all the water and hydrogens are
+removed. Be sure to look at the README there!
+
+### Writeup, Make Movies
+
+`/Project/`
+
+The /Project directory is all about writing up the associated manuscript and
+making any illustrations or movies from the simulation files.
 
 ## Crash recovery
 
@@ -298,29 +333,3 @@ start again you may do so from the directory `/Setup_and_Config/` using:
 ```
 
 ***CAREFUL***, this will do what it says!
-
-1. Analyse your results.
-   [github.com/s-gordon/analysis.git](https://github.com/s-gordon/analysis.git)
-
-This aspect of the directory structure has been moved to an independent
-repository:
-[github.com/s-gordon/analysis.git](https://github.com/s-gordon/analysis.git).
-Clone it using git with the following command:
-
-```sh
-git clone https://github.com/s-gordon/analysis.git <project-dir>/Analysis
-```
-
-For everything to work properly, it must be cloned with the top directory of
-`MD_workflow`.
-
-Once all your jobs are done, you can go into this directory and pool all the
-simulation data from all the directories and run some basic analysis as well as
-ligand and protein backbone clustering.  This can also help make the files more
-manageable by creating a subset of data where all the water and hydrogens are
-removed. Be sure to look at the README there!
-
-1.  Writeup, make movies.    `/Project/`
-
-The /Project directory is all about writing up the associated manuscript and
-making any illustrations or movies from the simulation files.
