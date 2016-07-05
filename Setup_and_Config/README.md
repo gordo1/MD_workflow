@@ -28,8 +28,10 @@ Jobtemplate can take any structure you like! The default scripts use this
 particular structure to direct output.
 
 Make sure to edit your optimization and production configuration files to point
-to your structure input files and parameter files. (We use "sim_opt.conf" and
-"sim_production.conf" as default files here).
+to your structure input files and parameter files. (We use `sim_opt.conf` and
+`sim_production.conf` as default files here). A good discussion of what ensemble
+to use for each stage of the simulation is given
+[here](http://www.quimica.urv.es/~bo/MOLMOD/General/Dynamics/Ensembles.html).
 
 Before you go further, often it is a good idea to *benchmark* your simulation so
 you can get an idea of how well it runs on the system, and what optimal number
