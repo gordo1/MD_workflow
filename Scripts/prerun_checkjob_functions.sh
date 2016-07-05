@@ -7,11 +7,11 @@ extract_input_files(){
 opt_dcd=$( less    $optimize_script   |grep dcdfreq | awk '{print $2;}'  )
 prod_dcd=$( less   $production_script |grep dcdfreq |awk '{print $2;}' )
 
-opt_input=$( less  $optimize_script   |grep 'coordinates\|structure'    | awk '{print $2;}' )
-prod_input=$( less $production_script |grep 'coordinates\|structure' | awk '{print $2;}' )
+opt_input=$( less  $optimize_script   |grep 'set coordinates\|structure'    | awk '{print $3;}' )
+prod_input=$( less $production_script |grep 'set coordinates\|structure' | awk '{print $3;}' )
 
-opt_param=$( less  $optimize_script   |grep parameters | grep -v "#par" | awk '{print $2;}' )
-prod_param=$( less $production_script |grep parameters | grep -v "#par" | awk '{print $2;}' )
+opt_param=$( less  $optimize_script   |grep '^parameters' | awk '{print $2;}' )
+prod_param=$( less $production_script |grep '^parameters' | awk '{print $2;}' )
 
 # --check for existance of sbatch and configuration files: -----------------------------
 # some error messages:
@@ -60,11 +60,12 @@ fi
 ##>----------------------------------------------------------------------------------------
 extract_job_details(){
 opt_dcd=$( less $optimize_script |grep dcdfreq | awk '{print $2;}'  )
-prod_dcd=$( less $production_script |grep dcdfreq |awk '{print $2;}' )
-opt_steps=$( less $optimize_script |grep dcdfreq | awk '{print $2;}'  )
 prod_steps=$( less $production_script |grep NumberSteps | head -n 1 |awk '{print $3;}' )
-pdb_file=$( less $production_script |grep coordinates | awk '{print $2;}' )
-psf_file=$( less $production_script |grep structure | awk '{print $2;}' )
+traj_per_run=$( less $production_script |grep '^set traj_per_run' |awk '{print $3;}' )
+prod_dcd=$( echo "$prod_steps/$traj_per_run" | bc )
+opt_steps=$( less $optimize_script |grep dcdfreq | awk '{print $2;}'  )
+pdb_file=$( less $production_script |grep '^set coordinates' | awk '{print $3;}' )
+psf_file=$( less $production_script |grep '^set structure' | awk '{print $3;}' )
 prod_fs_step=$( less $production_script | grep timestep | tail -n 1 |awk '{print $2;}' )
 }
 
